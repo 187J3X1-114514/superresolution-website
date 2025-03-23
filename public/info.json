@@ -1,0 +1,88 @@
+{
+    "contributors": [
+        {
+            "name": "John Doe",
+            "website": "https://www.johndoe.com"
+        }
+    ],
+    "minecraft_versions": {
+        "forge": {
+            "versions": [
+                "1.20.4",
+                "1.20.1"
+            ],
+            "name": "Forge"
+        },
+        "fabric": {
+            "versions": [
+                "1.21.4",
+                "1.21.1",
+                "1.21",
+                "1.20.4",
+                "1.20.1"
+            ],
+            "name": "Fabric"
+        },
+        "neoforge": {
+            "versions": [
+                "1.21.4",
+                "1.21.1",
+                "1.21"
+            ],
+            "name": "NeoForge"
+        }
+    },
+    "algorithms": [
+        {
+            "simple_name": "FSR1",
+            "full_name_en": "AMD FidelityFX™ Super Resolution 1.0",
+            "full_name_zh": "AMD 超级分辨率锐画技术 1.0",
+            "github": "https://github.com/GPUOpen-Effects/FidelityFX-FSR",
+            "license": "MIT",
+            "available": true
+        },
+        {
+            "simple_name": "FSR2",
+            "full_name_en": "AMD FidelityFX™ Super Resolution 2.0",
+            "full_name_zh": "AMD 超级分辨率锐画技术 2.0",
+            "github": "https://github.com/GPUOpen-Effects/FidelityFX-FSR",
+            "license": "MIT",
+            "available": false
+        },
+        {
+            "simple_name": "NIS",
+            "full_name_en": "NVIDIA Image Scaling",
+            "full_name_zh": "NVIDIA 图像缩放",
+            "github": "https://github.com/NVIDIAGameWorks/NVIDIAImageScaling",
+            "license": "MIT",
+            "available": false
+        },
+        {
+            "simple_name": "SGSR",
+            "full_name_en": "Snapdragon Game Super Resolution",
+            "full_name_zh": "骁龙游戏超分辨率",
+            "github": "https://github.com/SnapdragonStudios/snapdragon-gsr",
+            "license": "BSD-3-Clause",
+            "available": true
+        }
+    ],
+    "support_systems": [
+        {
+            "name": "Windows",
+            "available": true
+        },
+        {
+            "name": "Linux",
+            "available": true
+        },
+        {
+            "name": "macOS",
+            "available": false
+        },
+        {
+            "name": "Android",
+            "available": false
+        }
+    ],
+    "current_version": "0.0.5a1"
+}
