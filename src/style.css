@@ -1,15 +1,3 @@
-/*HarmonyOS_Sans_SC_Medium.ttf*/
-@font-face {
-	font-family: HarmonyOS;
-	src: url(/HarmonyOS_Sans_SC_Medium.woff2);
-}
-
-/*JetBrainsMono-Medium.ttf*/
-@font-face {
-	font-family: JetBrainsMono;
-	src: url(/JetBrainsMono-Medium.ttf) format('truetype');
-}
-
 :root {
 	line-height: 1.5;
 	font-weight: 400;
@@ -30,6 +18,10 @@ body,
 
 body {
 	margin: 0;
+}
+
+html{
+	background-color: dimgrey;
 }
 
 @font-face {
@@ -165,11 +157,12 @@ body {
 	margin-block-end: 0.3em;
 }
 
-.description-part ul li h3{
+.description-part ul li h3 {
 	margin-block-start: 0.3em;
 	margin-block-end: 0.3em;
 }
-.description-part ul li{
+
+.description-part ul li {
 	font-size: 0.7rem;
 }
 
@@ -183,14 +176,14 @@ body {
 	font-size: 0.95rem;
 }
 
-.website-card{
+.website-card {
 	width: 150px;
 	height: 150px;
 	margin-left: 1em;
 	margin-right: 1em;
 }
 
-.website-card .img-mcmod{
+.website-card .img-mcmod {
 	width: 80%;
 	height: auto;
 	display: flex;
@@ -201,7 +194,7 @@ body {
 	user-select: none;
 }
 
-.website-card .img-github{
+.website-card .img-github {
 	width: 55%;
 	height: auto;
 	display: flex;
@@ -212,17 +205,17 @@ body {
 	user-select: none;
 }
 
-.website-card span{
-    display: block;
-    position: absolute;
-    user-select: none;
-    left: 50%;
-    transform: translate(-50%, -50%);
+.website-card span {
+	display: block;
+	position: absolute;
+	user-select: none;
+	left: 50%;
+	transform: translate(-50%, -50%);
 	top: 80%;
 	width: 100%;
 }
 
-.background{
+.background {
 	width: 100%;
 	height: 100%;
 	position: absolute;
@@ -232,7 +225,7 @@ body {
 	filter: blur(8px) brightness(0.7);
 }
 
-#app .done {
+.done {
 	animation: appEnter 500ms ease;
 }
 
@@ -259,5 +252,31 @@ html {
 
 	to {
 		opacity: 1;
+	}
+}
+
+.loading {
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1000;
+}
+
+.loadingdone {
+	animation: fadeout 200ms ease-out forwards;
+
+}
+
+@keyframes fadeout {
+	from {
+		opacity: 1;
+	}
+
+	to {
+		opacity: 0;
+		display: none;
 	}
 }
