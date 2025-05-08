@@ -58,12 +58,12 @@ export default {
                 this.scrollDirection = 'up';
                 this.previousScreen();
                 this.updateTabs()
-                
+
             }
-            
+
         },
         updateTabs() {
-            if (tabs.value)tabs.value.value = this.screens[this.currentScreen].id
+            if (tabs.value) tabs.value.value = this.screens[this.currentScreen].id
         },
         nextScreen() {
             if (this.currentScreen < this.screens.length - 1) {
@@ -81,7 +81,7 @@ export default {
             this.scrollDirection = index > this.currentScreen ? 'down' : 'up';
             if (this.currentScreen != index) nextImage()
             this.currentScreen = index;
-            
+
         },
         handleTouchStart(e: TouchEvent) {
             this.touchStartY = e.touches[0].clientY;
@@ -187,10 +187,10 @@ export default {
                             <h2>系统兼容性</h2>
                             <ul>
                                 <li><span>Windows</span></li>
-                                <li><span>Android (未测试，理论上兼容)</span></li>
-                                <li><span>Linux (未测试，理论上兼容)</span></li>
-                                <li><span>MacOS (暂不兼容)</span></li>
-
+                                <li><span>Linux (未测试，之后可能会会去除兼容)</span></li>
+                                <li><span>MacOS (不兼容)</span></li>
+                                <li><span>Android (不兼容，也不计划兼容)</span></li>
+                                <li><span>iOS (不兼容，也不计划兼容)</span></li>
                             </ul>
                         </div>
                         <div class="description-part center">
