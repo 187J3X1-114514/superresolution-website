@@ -50,7 +50,7 @@
             "full_name_zh": "AMD 超级分辨率锐画技术 2.0",
             "github": "https://github.com/GPUOpen-Effects/FidelityFX-FSR",
             "license": "MIT",
-            "available": false
+            "available": true
         },
         {
             "simple_name": "SGSR",
