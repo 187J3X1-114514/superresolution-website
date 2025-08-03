@@ -12,11 +12,13 @@ export default {
         RGBLogo,
         typingText
     },
+    
     setup() {
         return {
             tabs
         }
     },
+
     data() {
         return {
             info: info,
@@ -179,7 +181,7 @@ export default {
                         <div class="description-part">
                             <h2>硬件兼容性</h2>
                             <ul>
-                                <li><span>OpenGL 版本必须大于等于 4.3</span></li>
+                                <li><span>OpenGL 版本必须大于等于 4.1</span></li>
                                 <li><span>Vulkan 版本大于等于1.2 (非必须)</span></li>
                             </ul>
                         </div>
@@ -187,10 +189,10 @@ export default {
                             <h2>系统兼容性</h2>
                             <ul>
                                 <li><span>Windows</span></li>
-                                <li><span>Linux (未测试，之后可能会会去除兼容)</span></li>
-                                <li><span>MacOS (不兼容)</span></li>
-                                <li><span>Android (不兼容，也不计划兼容)</span></li>
-                                <li><span>iOS (不兼容，也不计划兼容)</span></li>
+                                <li><span>Linux</span></li>
+                                <li><span>MacOS (存在Bug)</span></li>
+                                <li><span>Android (不兼容，计划兼容)</span></li>
+                                <li><span>iOS (不兼容，不计划兼容)</span></li>
                             </ul>
                         </div>
                         <div class="description-part center">

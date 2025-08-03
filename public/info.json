@@ -1,20 +1,19 @@
 {
     "contributors": [
-        {
-            "name": "John Doe",
-            "website": "https://www.johndoe.com"
-        }
     ],
     "minecraft_versions": {
         "forge": {
             "versions": [
-                "1.20.4",
                 "1.20.1"
             ],
             "name": "Forge"
         },
         "fabric": {
             "versions": [
+                "1.21.8",
+                "1.21.7",
+                "1.21.6",
+                "1.21.5",
                 "1.21.4",
                 "1.21.1",
                 "1.21",
@@ -25,6 +24,10 @@
         },
         "neoforge": {
             "versions": [
+                "1.21.8",
+                "1.21.7",
+                "1.21.6",
+                "1.21.5",
                 "1.21.4",
                 "1.21.1",
                 "1.21"
@@ -46,14 +49,6 @@
             "full_name_en": "AMD FidelityFX™ Super Resolution 2.0",
             "full_name_zh": "AMD 超级分辨率锐画技术 2.0",
             "github": "https://github.com/GPUOpen-Effects/FidelityFX-FSR",
-            "license": "MIT",
-            "available": false
-        },
-        {
-            "simple_name": "NIS",
-            "full_name_en": "NVIDIA Image Scaling",
-            "full_name_zh": "NVIDIA 图像缩放",
-            "github": "https://github.com/NVIDIAGameWorks/NVIDIAImageScaling",
             "license": "MIT",
             "available": false
         },
@@ -84,5 +79,5 @@
             "available": false
         }
     ],
-    "current_version": "0.0.5a1"
+    "current_version": "0.8.0-alpha.1"
 }
