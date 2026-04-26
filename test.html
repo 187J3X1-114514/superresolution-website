@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Resolution Mod - 高性能超分辨</title>
+  
+  <!-- 引入科技感字体 Space Grotesk 和可读性好的 Roboto -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <!-- GSAP Core, ScrollTrigger & ScrollToPlugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollToPlugin.min.js"></script>
+
+  <style>
+    :root {
+      /* 浅绿色科技主题色板 */
+      --clr-bg: #050a07;
+      --clr-primary: #00ff9d;
+      --clr-primary-glow: #00ff9d40;
+      --clr-surface: rgba(10, 25, 15, 0.45);
+      --clr-surface-hover: rgba(15, 35, 23, 0.6);
+      --clr-text: #e2f1e8;
+      --clr-text-muted: #8ab49c;
+      --clr-border: rgba(0, 255, 157, 0.15);
+      --clr-danger: #ff4a4a;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      background-color: var(--clr-bg);
+      color: var(--clr-text);
+      font-family: 'Roboto', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+      cursor: none; 
+    }
+
+    h1, h2, h3, .tech-font { font-family: 'Space Grotesk', sans-serif; }
+
+    /* 背景与抽象几何 */
+    #bg-container {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: -3;
+      background-size: cover;
+      background-position: center;
+      filter: grayscale(80%) contrast(120%);
+    }
+
+    #bg-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: -2;
+      background: radial-gradient(circle at 50% 0%, rgba(0,255,157,0.05) 0%, var(--clr-bg) 70%),
+                  linear-gradient(180deg, rgba(5,10,7,0.85) 0%, rgba(5,10,7,0.98) 100%);
+    }
+
+    .geometric-shape {
+      position: fixed;
+      border: 1px solid var(--clr-primary-glow);
+      z-index: -1;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    /* 鼠标跟随 */
+    .cursor-glow {
+      position: fixed;
+      top: 0; left: 0;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, var(--clr-primary-glow) 0%, transparent 60%);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: screen;
+    }
+    .cursor-dot {
+      position: fixed;
+      width: 6px; height: 6px;
+      background-color: var(--clr-primary);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 10000;
+      box-shadow: 0 0 10px var(--clr-primary);
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+    }
+
+    /* Hero Section */
+    header {
+      min-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding-top: 100px;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border: 1px solid var(--clr-border);
+      background: var(--clr-surface);
+      color: var(--clr-primary);
+      border-radius: 100px;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+      backdrop-filter: blur(10px);
+      width: fit-content;
+    }
+
+    .hero-title {
+      font-size: 4.5rem;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: -1px;
+    }
+
+    .hero-title span { color: var(--clr-primary); }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--clr-text-muted);
+      max-width: 550px;
+      margin-bottom: 40px;
+    }
+
+    .btn-group { display: flex; gap: 16px; flex-wrap: wrap; }
+
+    .btn {
+      position: relative;
+      padding: 12px 28px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: none;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      background: transparent;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      border: 1px solid var(--clr-primary);
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary::before { background: var(--clr-primary); opacity: 0.1; }
+    .btn-primary:active::before { background: var(--clr-primary); opacity: 0.3; }
+    .btn-primary { color: var(--clr-primary); }
+    
+    .btn-outline::before { border: 1px solid rgba(255, 255, 255, 0.2); }
+    
+    .btn:hover { color: var(--clr-bg); text-shadow: none; box-shadow: 0 0 20px var(--clr-primary-glow); }
+    .btn:hover::before { background: var(--clr-primary); border-color: var(--clr-primary); opacity: 1; }
+
+    section {
+      margin-bottom: 100px;
+      position: relative;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      margin-bottom: 40px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-title::before {
+      content: '';
+      display: block;
+      width: 40px;
+      height: 2px;
+      background: var(--clr-primary);
+    }
+
+    .glass-card {
+      background-color: var(--clr-surface);
+      border: 1px solid var(--clr-border);
+      border-left: 3px solid var(--clr-primary);
+      backdrop-filter: blur(16px);
+      padding: 32px;
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+
+    /* 算法卡片阵列 */
+    .algo-grid-extended {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .algo-card {
+      background: linear-gradient(135deg, rgba(10,25,15,0.6) 0%, rgba(5,10,7,0.8) 100%);
+      border: 1px solid var(--clr-border);
+      border-top: 3px solid transparent;
+      padding: 32px 24px;
+      position: relative;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      /* GSAP 初始状态 */
+      opacity: 0;
+      transform: translateY(40px);
+    }
+
+    .algo-card:hover {
+      border-top: 3px solid var(--clr-primary);
+      background: linear-gradient(135deg, rgba(15,35,23,0.8) 0%, rgba(5,10,7,0.9) 100%);
+      transform: translateY(-5px) !important; /* 覆盖动画后的设定 */
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5), 0 0 20px var(--clr-primary-glow);
+    }
+
+    .algo-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .algo-card-title {
+      color: #fff;
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+
+    .algo-status {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      background: var(--clr-primary-glow);
+      color: var(--clr-primary);
+      border: 1px solid var(--clr-primary);
+      border-radius: 4px;
+    }
+
+    .status-interop {
+      background: rgba(138, 180, 156, 0.1);
+      color: var(--clr-text-muted);
+      border-color: var(--clr-text-muted);
+    }
+
+    .status-planned {
+      background: transparent;
+      color: #777;
+      border-color: #555;
+    }
+
+    .algo-desc {
+      color: var(--clr-text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    /* 版本展示标签 */
+    .version-group { margin-bottom: 32px; }
+    .version-group h3 { font-size: 1.1rem; margin-bottom: 16px; color: #fff; }
+    .version-tag {
+      display: inline-block;
+      padding: 8px 20px;
+      margin: 0 12px 12px 0;
+      background: transparent;
+      border: 1px solid var(--clr-border);
+      color: var(--clr-text-muted);
+      font-family: 'Space Grotesk', sans-serif;
+      transition: all 0.3s;
+    }
+    .version-tag:hover {
+      border-color: var(--clr-primary);
+      color: var(--clr-primary);
+      background: var(--clr-primary-glow);
+    }
+
+    /* 问题反馈区域 */
+    .issue-card { border-left-color: var(--clr-danger); }
+    .issue-card .section-title::before { background: var(--clr-danger); }
+
+    footer { padding: 60px 0; text-align: center; color: var(--clr-text-muted); font-size: 0.9rem; border-top: 1px solid var(--clr-border); margin-top: 60px; }
+
+    /* 线条扫描动画 */
+    .scanline {
+      width: 100%;
+      height: 100px;
+      z-index: 999;
+      position: fixed;
+      pointer-events: none;
+      background: linear-gradient(0deg, rgba(0,255,157,0) 0%, rgba(0,255,157,0.1) 50%, rgba(0,255,157,0) 100%);
+      opacity: 0.1;
+      top: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 网格背景与叠加层 -->
+  <div id="bg-container"></div>
+  <div id="bg-overlay"></div>
+  <div class="scanline"></div>
+  <div id="geometry-wrapper"></div>
+
+  <!-- 鼠标指示器 -->
+  <div class="cursor-glow" id="cursor-glow"></div>
+  <div class="cursor-dot" id="cursor-dot"></div>
+
+  <div class="container">
+    
+    <header id="hero">
+      <div class="hero-badge">Minecraft Optimization Mod</div>
+      <h1 class="hero-title">Super <br><span>Resolution</span></h1>
+      <p class="hero-desc">在 Minecraft 中集成前沿的空间缩放与帧生成技术，在保持良好画质的同时大幅降低显卡负载并提升帧率。</p>
+      
+      <div class="btn-group">
+        <a href="https://modrinth.com/mod/superresolution" target="_blank" class="btn btn-primary">
+          Modrinth 主页
+        </a>
+        <a href="https://github.com/187J3X1-114514/superresolution" target="_blank" class="btn btn-outline">
+          GitHub 代码库
+        </a>
+        <button id="learn-more-btn" class="btn btn-outline" style="border-style: dashed;">
+          架构导览 ↓
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <!-- 引擎概览 -->
+      <section id="overview" class="glass-card section-animate">
+        <h2 class="section-title">系统概览</h2>
+        <p>该模组为 Minecraft 深度引入了多种业界前沿的超分辨率与帧生成算法。通过拦截底层的渲染管线，模组能够指令 GPU 以较低的原生分辨率进行画面渲染，随后通过精密算法还原细节纹理。全程在几乎不损耗模型与材质精度的前提下，解放性能瓶颈，实现帧率的数倍飙升，完美兼容核显与主流独立显卡。</p>
+      </section>
+
+      <!-- 算法阵列 -->
+      <section id="algorithms">
+        <h2 class="section-title section-animate">集成算法矩阵</h2>
+        
+        <div class="algo-grid-extended">
+          
+          <!-- FSR 1.0 -->
+          <div class="algo-card">
+            <div class="algo-card-header">
+              <h3 class="algo-card-title tech-font">AMD FSR 1.0</h3>
+              <span class="algo-status">NATIVE</span>
+            </div>
+            <p class="algo-desc">第一代空间缩放算法。拥有极低的性能开销与无可匹敌的硬件兼容性。它通过单次边缘重建的通道放大图像，尤其适合老旧硬件或核显玩家进行极限的帧率压榨。</p>
+          </div>
+
+          <!-- FSR 2.0 -->
+          <div class="algo-card">
+            <div class="algo-card-header">
+              <h3 class="algo-card-title tech-font">AMD FSR 2.0</h3>
+              <span class="algo-status">NATIVE</span>
+            </div>
+            <p class="algo-desc">高级时域（Temporal）超分技术。它追踪游戏的多帧历史数据与像素运动矢量，消除画面闪烁与锯齿，在提供高额帧率的同时，呈现极为锐利且接近原生分辨率的高级画质。</p>
+          </div>
+
+          <!-- SGSR -->
+          <div class="algo-card">
+            <div class="algo-card-header">
+              <h3 class="algo-card-title tech-font">Snapdragon GSR</h3>
+              <span class="algo-status">NATIVE</span>
+            </div>
+            <p class="algo-desc">包含 SGSR 1.0 与 2.0 版本。专为移动端底层及轻薄本优化的前向渲染缩放算法，极大降低了显存带宽高负荷产生的功耗积热问题，确保长时间游玩的绝对稳定。</p>
+          </div>
+
+          <!-- DLSS -->
+          <div class="algo-card">
+            <div class="algo-card-header">
+              <h3 class="algo-card-title tech-font">NVIDIA DLSS</h3>
+              <span class="algo-status status-interop">INTEROP</span>
+            </div>
+            <p class="algo-desc">深度学习超级采样。调用 RTX 显卡独有的 Tensor Cores 计算单元，由专属的 AI 神经网络实时填补像素细节，呈现出突破物理限制的极致抗锯齿视觉体验与性能平衡。</p>
+          </div>
+
+          <!-- XeSS -->
+          <div class="algo-card">
+            <div class="algo-card-header">
+              <h3 class="algo-card-title tech-font">Intel XeSS</h3>
+              <span class="algo-status status-interop">INTEROP</span>
+            </div>
+            <p class="algo-desc">由 AI 驱动的矩阵扩展超级采样。支持 DP4a 指令集，使其不仅在英特尔 Arc 显卡表现卓越，同样也能在其他品牌的现代架构显卡上提供高保真级的时域画面增强。</p>
+          </div>
+
+          <!-- FSR 3.0 -->
+          <div class="algo-card">
+            <div class="algo-card-header">
+              <h3 class="algo-card-title tech-font">AMD FSR 3.0</h3>
+              <span class="algo-status status-interop">INTEROP</span>
+            </div>
+            <p class="algo-desc">突破性的光学流帧生成（Frame Generation）技术集成。通过分析连续画面并在其间插入预测的全新帧，打破 CPU 渲染瓶颈，将原本流畅的游戏体验直接推向电竞发烧级的高帧率。</p>
+          </div>
+
+          <!-- Arm ASR -->
+          <div class="algo-card" style="border-style: dashed;">
+            <div class="algo-card-header">
+              <h3 class="algo-card-title tech-font">Arm ASR</h3>
+              <span class="algo-status status-planned">PLANNED</span>
+            </div>
+            <p class="algo-desc">精确超分辨率技术，未来规划实装。主要着眼于使用 Arm 架构处理器的轻量级与便携设备方案，进一步下探功耗底线并控制设备发热。</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- 环境支持 -->
+      <section class="section-animate">
+        <h2 class="section-title">支持的游戏平台</h2>
+        <div class="version-group">
+          <h3 class="tech-font">[ FABRIC CORE ]</h3>
+          <div>
+            <span class="version-tag">STABLE 1.21.x</span>
+            <span class="version-tag">LTS 1.20.1</span>
+          </div>
+        </div>
+        <div class="version-group">
+          <h3 class="tech-font">[ NEOFORGE / FORGE ]</h3>
+          <div>
+            <span class="version-tag">STABLE 1.21.x</span>
+            <span class="version-tag">LTS 1.20.1</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 拦截与报错 -->
+      <section class="glass-card issue-card section-animate">
+        <h2 class="section-title" style="color: var(--clr-danger);">问题追踪与反馈</h2>
+        <p style="color: var(--clr-text-muted);">如果在游戏运行中遇到光影渲染异常、花屏重影或发生严重内核崩溃，请前往 GitHub Issues 页面完整提交您的 Crash Log 或问题复现步骤。<b>请勿在平台评论区反馈 Bug</b>，以便于开发者精准定位、追踪跟进并部署热修复补丁。</p>
+      </section>
+
+    </main>
+
+    <footer>
+      <p class="tech-font">© 2024 Super Resolution Mod Team. All Rights Reserved.</p>
+    </footer>
+  </div>
+
+  <script>
+    // --- 1. 背景与背景几何体初始化 ---
+    const bgContainer = document.getElementById('bg-container');
+    const randomIdx = Math.floor(Math.random() * 10);
+    bgContainer.style.backgroundImage = `url('https://minecraft-superresolution.netlify.app/background/${randomIdx}.jpg')`;
+
+    // 动态抽象几何体底图漂浮
+    const geometryWrapper = document.getElementById('geometry-wrapper');
+    for(let i = 0; i < 4; i++) {
+        let box = document.createElement('div');
+        box.className = 'geometric-shape';
+        box.style.width = Math.random() * 400 + 100 + 'px';
+        box.style.height = box.style.width;
+        box.style.left = Math.random() * 100 + 'vw';
+        box.style.top = Math.random() * 100 + 'vh';
+        box.style.transform = `rotate(${Math.random() * 45}deg)`;
+        geometryWrapper.appendChild(box);
+    }
+
+    // --- 2. 自定义鼠标跟随逻辑 ---
+    const cursorGlow = document.getElementById('cursor-glow');
+    const cursorDot = document.getElementById('cursor-dot');
+    window.addEventListener("mousemove", (e) => {
+      gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.1 });
+      gsap.to(cursorGlow, { x: e.clientX, y: e.clientY, duration: 0.8, ease: "power2.out" });
+    });
+
+    // --- 3. GSAP 核心动画 ---
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+    // 扫描线无限循环滚动
+    gsap.to(".scanline", {
+      y: window.innerHeight,
+      duration: 3.5,
+      repeat: -1,
+      ease: "none",
+      modifiers: { y: gsap.utils.unitize(y => parseFloat(y) % window.innerHeight) }
+    });
+
+    // 漂浮几何呼吸特效
+    gsap.utils.toArray('.geometric-shape').forEach(shape => {
+      gsap.to(shape, {
+        x: "random(-150, 150)",
+        y: "random(-150, 150)",
+        rotation: "random(-90, 90)",
+        duration: "random(15, 25)",
+        repeat: -1,
+        yoyo: true,
+        ease: "sine.inOut"
+      });
+    });
+
+    // 首屏 Timeline 入场序列
+    const tlHero = gsap.timeline();
+    tlHero.from(".hero-badge", { y: -20, opacity: 0, duration: 0.8, ease: "power3.out", delay: 0.2 })
+          .from(".hero-title", { 
+            duration: 1.2, y: 50, opacity: 0, clipPath: "inset(100% 0 0 0)", ease: "expo.out" 
+          }, "-=0.4")
+          .from(".hero-desc", { y: 20, opacity: 0, duration: 0.8 }, "-=0.8")
+          .from(".btn-group .btn", { 
+            scale: 0.9, opacity: 0, stagger: 0.15, duration: 0.6, ease: "back.out(1.7)" 
+          }, "-=0.5");
+
+    // 导航下滚平滑锚点
+    document.getElementById('learn-more-btn').addEventListener('click', () => {
+      gsap.to(window, { duration: 1.2, scrollTo: { y: "#overview", offsetY: 40 }, ease: "power4.inOut" });
+    });
+
+    // 常规卡片滚动触发显示
+    gsap.utils.toArray(".section-animate").forEach(section => {
+      gsap.from(section, {
+        scrollTrigger: {
+          trigger: section,
+          start: "top 85%"
+        },
+        y: 50, opacity: 0, duration: 0.8, ease: "power2.out"
+      });
+    });
+
+    // ==========================================
+    // 核心重构特效：算法卡片网格交错浮现批处理 (Batch)
+    // ==========================================
+    ScrollTrigger.batch(".algo-card", {
+      start: "top 85%", // 进入视口 85% 时触发
+      onEnter: (elements) => {
+        gsap.to(elements, {
+          y: 0,
+          opacity: 1,
+          stagger: 0.12, // 间隔 0.12s 逐个弹出，形成波浪或打字般的阵列效果
+          duration: 0.8,
+          ease: "back.out(1.6)", // 轻微回弹，增强科技界面的物理质感
+          overwrite: "auto"
+        });
+      },
+      // 若想页面拉上去再下来还能重新播放动画，可启用下面这行：
+      onLeaveBack: (elements) => { gsap.set(elements, {y: 40, opacity: 0, overwrite: "auto"}); }
+    });
+
+    // 平台版本按钮小跳跃
+    gsap.utils.toArray(".version-tag").forEach((tag, i) => {
+      gsap.from(tag, {
+        scrollTrigger: {
+          trigger: tag.closest('.version-group'),
+          start: "top 85%"
+        },
+        scale: 0.5, opacity: 0, duration: 0.6, delay: i * 0.1, ease: "back.out(2)"
+      });
+    });
+
+  </script>
+</body>
+</html>

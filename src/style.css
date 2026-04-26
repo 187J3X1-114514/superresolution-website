@@ -13,7 +13,6 @@ body,
 #app {
 	font-family: JetBrainsMono, HarmonyOS;
 	height: 100%;
-	overflow-y: hidden;
 }
 
 body {
