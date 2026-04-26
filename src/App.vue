@@ -9,6 +9,7 @@ import VersionGroups from './components/VersionGroups.vue'
 import IssueCard from './components/IssueCard.vue'
 import LinkCards from './components/LinkCards.vue'
 import { info } from "./info";
+import type { VersionInfo } from './components/VersionGroups.vue';
 import { defineComponent } from 'vue'
 
 export default defineComponent({
@@ -146,7 +147,7 @@ export default defineComponent({
           "state": "main",
           "latest_version": "0.8.2-alpha.1"
         }
-      ]
+      ] as VersionInfo[]
     }
   }
 })
