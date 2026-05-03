@@ -8,7 +8,6 @@ import AlgorithmCard from './components/AlgorithmCard.vue'
 import VersionGroups from './components/VersionGroups.vue'
 import IssueCard from './components/IssueCard.vue'
 import LinkCards from './components/LinkCards.vue'
-import { info } from "./info";
 import type { VersionInfo } from './components/VersionGroups.vue';
 import { defineComponent } from 'vue'
 
@@ -27,8 +26,6 @@ export default defineComponent({
   },
   data() {
     return {
-      info: info,
-      // 提取算法数据以便复用
       algoList: [
         {
           "title": "AMD FSR 1",

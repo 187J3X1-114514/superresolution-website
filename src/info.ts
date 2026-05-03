@@ -36,10 +36,3 @@ export interface Info {
     support_systems: SupportSystem[];
     current_version: string;
 }
-
-export const info: Info = await fetch('/info.json').then(res => res.json());
-info.minecraft_versions.support = [];
-info.minecraft_versions.fabric.versions.forEach(version => info.minecraft_versions.support.push(version));
-info.minecraft_versions.forge.versions.forEach(version => info.minecraft_versions.support.push(version));
-info.minecraft_versions.neoforge.versions.forEach(version => info.minecraft_versions.support.push(version));
-info.minecraft_versions.support = [...new Set(info.minecraft_versions.support)];

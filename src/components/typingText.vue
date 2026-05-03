@@ -84,14 +84,12 @@ export default {
                             this.lastStepTime = now;
                         }
                     }
-                }
-                else if (this.status === "waiting") {
+                } else if (this.status === "waiting") {
                     if (!isFinal && now - this.lastStepTime >= this.switchDelay) {
                         this.status = "deleting";
                         this.lastStepTime = now;
                     }
-                }
-                else if (this.status === "deleting") {
+                } else if (this.status === "deleting") {
                     if (now - this.lastStepTime >= this.deleteInterval) {
                         this.lastStepTime = now;
 
