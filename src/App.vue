@@ -75,26 +75,26 @@ export default defineComponent({
                 {
           "version": "26.1 - 26.1.2",
           "loader": "fabric",
-          "state": "wip",
-          "latest_version": "-"
+          "state": "main",
+          "latest_version": "0.8.3-alpha.3"
         },
         {
           "version": "26.1 - 26.1.2",
           "loader": "neoforge",
-          "state": "wip",
-          "latest_version": "-"
+          "state": "main",
+          "latest_version": "0.8.3-alpha.3"
         },
         {
           "version": "1.21.11",
           "loader": "fabric",
           "state": "main",
-          "latest_version": "0.8.3-alpha.2"
+          "latest_version": "0.8.3-alpha.3"
         },
         {
           "version": "1.21.11",
           "loader": "neoforge",
           "state": "main",
-          "latest_version": "0.8.3-alpha.2"
+          "latest_version": "0.8.3-alpha.3"
         },
         {
           "version": "1.21.4 - 1.21.8",
@@ -112,13 +112,13 @@ export default defineComponent({
           "version": "1.21 - 1.21.1",
           "loader": "fabric",
           "state": "main",
-          "latest_version": "0.8.3-alpha.2"
+          "latest_version": "0.8.3-alpha.3"
         },
         {
           "version": "1.21 - 1.21.1",
           "loader": "neoforge",
           "state": "main",
-          "latest_version": "0.8.3-alpha.2"
+          "latest_version": "0.8.3-alpha.3"
         },
         {
           "version": "1.20.6",
