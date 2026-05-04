@@ -18,7 +18,37 @@ export const enSidebar: DefaultTheme.SidebarMulti = {
       text: 'Shaderpack Developers',
       items: [
         { text: 'About the Interface', link: '/Shaderpack-Interface-documentation/' },
-        { text: 'Schema Version 1', link: '/Shaderpack-Interface-documentation/Version-1/' },
+        {
+          text: 'Shader Pack Integration Guide',
+          items: [{ text: 'Schema Version 1', link: '/Shaderpack-Interface-documentation/Version-1/' }],
+        },
+      ],
+    },
+  ],
+}
+
+export const zhSidebar: DefaultTheme.SidebarMulti = {
+  '/zh/': [
+    {
+      text: '概览',
+      items: [{ text: '首页', link: '/zh/' }],
+    },
+    {
+      text: '调试',
+      items: [{ text: '调试指南', link: '/zh/Debugging-instructions/' }],
+    },
+    {
+      text: 'Mod 开发者',
+      items: [{ text: 'Mod API 文档', link: '/zh/Mod-API-Documentation/' }],
+    },
+    {
+      text: '光影包开发者',
+      items: [
+        { text: '接口概览', link: '/zh/Shaderpack-Interface-documentation/' },
+        {
+          text: '光影包集成指南',
+          items: [{ text: 'Schema Version 1', link: '/zh/Shaderpack-Interface-documentation/Version-1/' }],
+        },
       ],
     },
   ],
@@ -78,6 +108,9 @@ function sidebarToNav(sidebar: DefaultTheme.SidebarMulti, base: string): Default
     overviewLink,
     ...sections.map((section) => {
       const links = flattenSidebarLinks(section.items)
+      const activeLinks = links
+        .map((item) => item.link)
+        .filter((link): link is string => typeof link === 'string')
 
       if (links.length === 1) {
         return {
@@ -89,34 +122,10 @@ function sidebarToNav(sidebar: DefaultTheme.SidebarMulti, base: string): Default
       return {
         text: section.text,
         items: links,
-        activeMatch: makeActiveMatch(links.map((item) => item.link)),
+        activeMatch: makeActiveMatch(activeLinks),
       }
     }),
   ].filter(Boolean)
-}
-
-export const zhSidebar: DefaultTheme.SidebarMulti = {
-  '/zh/': [
-    {
-      text: '概览',
-      items: [{ text: '首页', link: '/zh/' }],
-    },
-    {
-      text: '调试',
-      items: [{ text: '调试指南', link: '/zh/Debugging-instructions/' }],
-    },
-    {
-      text: 'Mod 开发者',
-      items: [{ text: 'Mod API 文档', link: '/zh/Mod-API-Documentation/' }],
-    },
-    {
-      text: '光影包开发者',
-      items: [
-        { text: '接口概览', link: '/zh/Shaderpack-Interface-documentation/' },
-        { text: 'Schema Version 1', link: '/zh/Shaderpack-Interface-documentation/Version-1/' },
-      ],
-    },
-  ],
 }
 
 export const enNav: DefaultTheme.NavItem[] = sidebarToNav(enSidebar, '/')

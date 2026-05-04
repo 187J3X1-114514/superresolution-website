@@ -1,3 +1,7 @@
+---
+title: "Debugging Guide"
+---
+
 # Debugging Guide
 
 ## File Locations
@@ -10,7 +14,6 @@
 | `<game directory>/config/super_resolution/error_logs` | Shader compilation error reports |
 | `<game directory>/config/super_resolution/shader_caches` | Shader cache files |
 
----
 
 ## Debug Mode
 
@@ -23,7 +26,6 @@ Enable it in the in-game configuration screen, or set `enable_debug = true` in `
 - GPU resources created by SR (textures, framebuffers, shaders, etc.) will be labeled, making them visible and identifiable in graphics debugging tools such as **NVIDIA Nsight Graphics** and **RenderDoc**.
 - GPU operations performed by SR will be wrapped in **debug groups**, so you can see clearly where each operation begins and ends in a frame capture.
 
----
 
 ## Shader Code Dump
 

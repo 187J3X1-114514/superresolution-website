@@ -1,3 +1,7 @@
+---
+title: "About"
+---
+
 # About
 
 Almost all temporal upsampling algorithms require motion vector input and a jittered color buffer, but these are difficult to implement in Minecraft. Therefore, we provide an interface for Shaderpack to provide these.

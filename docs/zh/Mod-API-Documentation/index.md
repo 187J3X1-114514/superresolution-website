@@ -1,3 +1,7 @@
+---
+title: "包"
+---
+
 # 包
 `io.homo.superresolution.api`
 
@@ -22,7 +26,6 @@ SuperResolutionAPI.EVENT_BUS.addListener((LevelRenderStartEvent event) -> {
 });
 ```
 
----
 
 ## 3. 自定义超分辨率算法
 
@@ -77,7 +80,6 @@ QualityPreset preset = new QualityPreset()
         .setUpscaleRatio(1.5f);
 ```
 
----
 
 ## 4. 算法注册与发现
 
@@ -107,7 +109,6 @@ QualityPreset preset = new QualityPreset()
 
 > **注意：** 注册表在静态初始化期间执行内置算法注册，之后会触发 `AlgorithmRegisterEvent`。如果你想注册自定义算法，请监听此事件。
 
----
 
 ## 5. 事件（`api.event`）
 
@@ -131,7 +132,6 @@ QualityPreset preset = new QualityPreset()
 > [!NOTE]
 > `LevelRenderStart` / `LevelRenderEnd` 的确切触发点可能会受到捕获模式的影响。
 
----
 
 ## 6. 需求系统（`api.utils.Requirement`）
 
@@ -162,7 +162,6 @@ QualityPreset preset = new QualityPreset()
 > [!NOTE]
 > `AlgorithmRegistry.isAlgorithmSupported(...)` 具有缓存语义；如果运行时能力发生变化，请考虑缓存失效。
 
----
 
 ## 7. 额外资源下载（`api.registry.ExtraResource*`）
 
@@ -200,5 +199,3 @@ QualityPreset preset = new QualityPreset()
 - `ResourcesProgressListener` — 下载进度回调
 - `ResourcesFinishListener` — 下载完成回调
 - `ResourcesErrorListener` — Download error callback
-
----

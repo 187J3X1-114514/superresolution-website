@@ -1,3 +1,7 @@
+---
+title: "Package"
+---
+
 # Package
 `io.homo.superresolution.api`
 
@@ -22,7 +26,6 @@ SuperResolutionAPI.EVENT_BUS.addListener((LevelRenderStartEvent event) -> {
 });
 ```
 
----
 
 ## 3. Custom Upscaling Algorithm
 
@@ -77,7 +80,6 @@ QualityPreset preset = new QualityPreset()
         .setUpscaleRatio(1.5f);
 ```
 
----
 
 ## 4. Algorithm Registration and Discovery
 
@@ -107,7 +109,6 @@ Describes a registerable algorithm.
 
 > **Note:** The registry performs built-in algorithm registration during static initialization, after which `AlgorithmRegisterEvent` is fired. If you want to register a custom algorithm, listen to this event.
 
----
 
 ## 5. Events (`api.event`)
 
@@ -131,7 +132,6 @@ The following events can be subscribed to via `SuperResolutionAPI.EVENT_BUS`:
 > [!NOTE]
 > The exact trigger points of `LevelRenderStart` / `LevelRenderEnd` may be affected by capture mode.
 
----
 
 ## 6. Requirement System (`api.utils.Requirement`)
 
@@ -162,7 +162,6 @@ Validation entry points:
 > [!NOTE]
 > `AlgorithmRegistry.isAlgorithmSupported(...)` has caching semantics; consider cache invalidation if runtime capabilities change.
 
----
 
 ## 7. Extra Resource Downloads (`api.registry.ExtraResource*`)
 
@@ -200,5 +199,3 @@ Error codes `ErrorCode`:
 - `ResourcesProgressListener` — Download progress callback
 - `ResourcesFinishListener` — Download completion callback
 - `ResourcesErrorListener` — Download error callback
-
----

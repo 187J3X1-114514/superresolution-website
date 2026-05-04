@@ -1,4 +1,5 @@
 ---
+title: "Wiki 文档"
 layout: home
 
 hero:

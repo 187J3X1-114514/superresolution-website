@@ -1,18 +1,80 @@
+.VPSidebar .nav {
+  --sr-sidebar-branch-color: color-mix(in srgb, var(--vp-c-divider) 72%, transparent);
+  --sr-sidebar-branch-muted-color: color-mix(in srgb, var(--vp-c-divider) 44%, transparent);
+  --sr-sidebar-hover-bg: var(--vp-c-default-soft);
+  --sr-sidebar-active-bg: var(--vp-c-brand-soft);
+  --sr-sidebar-radius: 7px;
+}
+
 .VPSidebar .nav .item h2.text {
   font-size: 18px;
+  line-height: 28px;
 }
 
 .VPSidebar .nav .VPSidebarItem.level-0 > .items {
+  margin-top: 8px;
+  border-left: 1px solid var(--sr-sidebar-branch-color);
+  padding-left: 14px;
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1 > .items,
+.VPSidebar .nav .VPSidebarItem.level-2 > .items,
+.VPSidebar .nav .VPSidebarItem.level-3 > .items {
   margin-top: 4px;
-  border-left: 1px solid var(--vp-c-divider);
-  padding-left: 16px;
+  margin-left: 7px;
+  border-left: 1px solid var(--sr-sidebar-branch-muted-color);
+  padding-left: 12px;
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1 > .item,
+.VPSidebar .nav .VPSidebarItem.level-2 > .item,
+.VPSidebar .nav .VPSidebarItem.level-3 > .item {
+  align-items: center;
+  min-height: 30px;
+  margin: 1px 0;
+  border-radius: var(--sr-sidebar-radius);
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1.is-link > .item > .link,
+.VPSidebar .nav .VPSidebarItem.level-2.is-link > .item > .link,
+.VPSidebar .nav .VPSidebarItem.level-3.is-link > .item > .link {
+  min-width: 0;
+  min-height: 30px;
+  margin-left: -7px;
+  padding: 2px 10px 2px 7px;
+  border-radius: var(--sr-sidebar-radius);
+  transition:
+    background-color 0.25s,
+    box-shadow 0.25s;
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1.is-link > .item > .link:hover,
+.VPSidebar .nav .VPSidebarItem.level-2.is-link > .item > .link:hover,
+.VPSidebar .nav .VPSidebarItem.level-3.is-link > .item > .link:hover {
+  background-color: var(--sr-sidebar-hover-bg);
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1.is-active > .item > .link,
+.VPSidebar .nav .VPSidebarItem.level-2.is-active > .item > .link,
+.VPSidebar .nav .VPSidebarItem.level-3.is-active > .item > .link {
+  background-color: var(--sr-sidebar-active-bg);
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1.is-link > .item > .link:focus-visible,
+.VPSidebar .nav .VPSidebarItem.level-2.is-link > .item > .link:focus-visible,
+.VPSidebar .nav .VPSidebarItem.level-3.is-link > .item > .link:focus-visible,
+.VPSidebar .nav .VPSidebarItem.level-1:not(.is-link) > .item:focus-visible,
+.VPSidebar .nav .VPSidebarItem.level-2:not(.is-link) > .item:focus-visible,
+.VPSidebar .nav .VPSidebarItem.level-3:not(.is-link) > .item:focus-visible {
+  outline: 2px solid var(--vp-c-brand-2);
+  outline-offset: 2px;
 }
 
 .VPSidebar .nav .item .indicator {
-  left: -17px;
-  top: 2px;
-  bottom: 2px;
-  width: 2px;
+  left: -15px;
+  top: 5px;
+  bottom: 5px;
+  width: 3px;
   background-color: var(--vp-c-brand-1);
   opacity: 0;
   transform: scaleY(0.35);
@@ -24,10 +86,43 @@
 }
 
 .VPSidebar .nav .item p.text {
+  min-width: 0;
   font-size: 15px;
+  line-height: 22px;
+  overflow-wrap: break-word;
+  text-wrap: pretty;
   transition:
     color 0.25s,
     transform 0.25s ease-in-out;
+}
+
+.VPSidebar .nav .VPSidebarItem.level-2 > .item p.text,
+.VPSidebar .nav .VPSidebarItem.level-3 > .item p.text {
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1:not(.is-link) > .item,
+.VPSidebar .nav .VPSidebarItem.level-2:not(.is-link) > .item,
+.VPSidebar .nav .VPSidebarItem.level-3:not(.is-link) > .item {
+  margin-top: 6px;
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1:not(.is-link) > .item > .text,
+.VPSidebar .nav .VPSidebarItem.level-2:not(.is-link) > .item > .text,
+.VPSidebar .nav .VPSidebarItem.level-3:not(.is-link) > .item > .text {
+  padding: 6px 0 2px;
+  line-height: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vp-c-text-3);
+  text-wrap: pretty;
+}
+
+.VPSidebar .nav .VPSidebarItem.level-1.has-active:not(.is-link) > .item > .text,
+.VPSidebar .nav .VPSidebarItem.level-2.has-active:not(.is-link) > .item > .text,
+.VPSidebar .nav .VPSidebarItem.level-3.has-active:not(.is-link) > .item > .text {
+  color: var(--vp-c-text-2);
 }
 
 .VPSidebar .nav .item p.text:hover,
