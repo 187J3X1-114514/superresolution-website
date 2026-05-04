@@ -12,75 +12,59 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref, nextTick} from 'vue';
-import {gsap} from 'gsap';
-import {ScrollTrigger} from 'gsap/ScrollTrigger';
-import {ScrollToPlugin} from 'gsap/ScrollToPlugin';
+import {defineComponent, onBeforeUnmount, onMounted, ref} from 'vue';
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+type ShapeStyle = Record<string, string>;
+
+function randomBetween(min: number, max: number) {
+    return Math.random() * (max - min) + min;
+}
 
 export default defineComponent({
     name: 'BackgroundEffects',
     setup() {
-        const shapes = ref<any[]>([]);
+        const shapes = ref<ShapeStyle[]>([]);
+        let removeMouseListener = () => {};
 
         onMounted(() => {
-            // background image selection
             const bgContainer = document.getElementById('bg-container');
             if (bgContainer) {
-                bgContainer.style.backgroundImage = `url('background/1.png')`;
+                bgContainer.style.backgroundImage = `url('/background/1.png')`;
             }
 
-            // geometric shapes
-            const newShapes = [];
-            for (let i = 0; i < 4; i++) {
-                const w = Math.floor(Math.random() * 400) + 100;
-                newShapes.push({
-                    width: `${w}px`,
-                    height: `${w}px`,
+            shapes.value = Array.from({length: 4}, () => {
+                const size = Math.floor(randomBetween(100, 500));
+
+                return {
+                    width: `${size}px`,
+                    height: `${size}px`,
                     left: `${Math.random() * 100}vw`,
                     top: `${Math.random() * 100}vh`,
-                    transform: `rotate(${Math.random() * 45}deg)`
-                });
-            }
-            shapes.value = newShapes;
+                    '--shape-rotation': `${randomBetween(0, 45)}deg`,
+                    '--shape-rotation-drift': `${randomBetween(-90, 90)}deg`,
+                    '--shape-drift-x': `${randomBetween(-150, 150)}px`,
+                    '--shape-drift-y': `${randomBetween(-150, 150)}px`,
+                    '--shape-duration': `${randomBetween(15, 25)}s`,
+                    '--shape-delay': `-${randomBetween(0, 25)}s`
+                };
+            });
 
-            // mouse follower
             const cursorGlow = document.getElementById('cursor-glow');
             const cursorDot = document.getElementById('cursor-dot');
-            window.addEventListener('mousemove', (e) => {
-                if (cursorDot) gsap.to(cursorDot, {x: e.clientX, y: e.clientY, duration: 0.1});
-                if (cursorGlow) gsap.to(cursorGlow, {
-                    x: e.clientX - 200,
-                    y: e.clientY - 200,
-                    duration: 0.5,
-                    ease: 'power2.out'
-                });
-            });
+            const onMouseMove = (event: MouseEvent) => {
+                cursorDot?.style.setProperty('transform', `translate(${event.clientX}px, ${event.clientY}px)`);
+                cursorGlow?.style.setProperty(
+                    'transform',
+                    `translate(${event.clientX - 200}px, ${event.clientY - 200}px) scale(4)`
+                );
+            };
 
-            // scanline animation
-            //gsap.to('.scanline', {
-            //  y: window.innerHeight,
-            //  duration: 3.5,
-            //  repeat: -1,
-            //  ease: 'none',
-            //  modifiers: {y: gsap.utils.unitize((y: any) => parseFloat(y) % window.innerHeight)}
-            //});
+            window.addEventListener('mousemove', onMouseMove);
+            removeMouseListener = () => window.removeEventListener('mousemove', onMouseMove);
+        });
 
-            // float shapes
-            nextTick(() => {
-                gsap.utils.toArray('.geometric-shape').forEach((shape) => {
-                    gsap.to(shape as Element, {
-                        x: 'random(-150, 150)',
-                        y: 'random(-150, 150)',
-                        rotation: 'random(-90, 90)',
-                        duration: 'random(15, 25)',
-                        repeat: -1,
-                        yoyo: true,
-                        ease: 'sine.inOut'
-                    });
-                });
-            });
+        onBeforeUnmount(() => {
+            removeMouseListener();
         });
 
         return {shapes};
@@ -106,6 +90,20 @@ export default defineComponent({
     z-index: 0;
     opacity: 0.3;
     pointer-events: none;
+    transform: rotate(var(--shape-rotation));
+    animation: floatShape var(--shape-duration) ease-in-out infinite alternate;
+    animation-delay: var(--shape-delay);
+}
+
+@keyframes floatShape {
+    from {
+        transform: translate3d(0, 0, 0) rotate(var(--shape-rotation));
+    }
+
+    to {
+        transform: translate3d(var(--shape-drift-x), var(--shape-drift-y), 0)
+            rotate(calc(var(--shape-rotation) + var(--shape-rotation-drift)));
+    }
 }
 
 .cursor-glow {
@@ -119,6 +117,7 @@ export default defineComponent({
     background: radial-gradient(circle, rgba(0, 255, 157, 0.15) 0%, transparent 10%);
     transform-origin: 50% 50%;
     transform: scale(4);
+    transition: transform 0.45s ease-out;
 }
 
 .cursor-dot {
@@ -130,6 +129,7 @@ export default defineComponent({
     pointer-events: none;
     z-index: 10000;
     box-shadow: 0 0 10px #00ff9d;
+    transition: transform 0.1s linear;
 }
 
 #bg-container {

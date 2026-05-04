@@ -186,7 +186,7 @@ SR requires **three** inputs. All three must be provided and enabled. If any inp
 
 The `"region"` field specifies which part of a texture to read from or write to:
 
-```
+```text
 "region": [X, Y, W, H]
 ```
 
@@ -273,7 +273,7 @@ Motion vectors must:
 - Be in **UV space** (normalized 0–1 coordinates).
 - Be computed as:
 
-```
+```text
 motion = previous_uv - current_uv
 ```
 
@@ -299,9 +299,9 @@ When SR is installed and a shader pack includes a valid `superresolution.json`, 
 | `SR_DISABLE`                | Inverse of `SR_ENABLE`.                                                                          |
 | `SR_USING_ALGO`             | Integer ID of the currently active algorithm. `0` if upscaling is disabled.                      |
 | `SR_ALGO_<NAME>`            | Integer ID for each registered algorithm (e.g., `SR_ALGO_FSR2`). Useful for comparing with `SR_USING_ALGO`. |
-| `SR_ALGO_SUPPORTS_JITTER`  | `1` if the active algorithm supports jitter, `0` otherwise.                                      |
-| `SR_SHOULD_APPLY_SCALE`    | `1` if upscaling is enabled, `0` otherwise.                                                     |
-| `SR_SHOULD_APPLY_JITTER`   | `1` if upscaling is enabled, `0` otherwise.                                                     |
+| `SR_ALGO_SUPPORTS_JITTER`   | `1` if the active algorithm supports jitter, `0` otherwise.                                      |
+| `SR_SHOULD_APPLY_SCALE`     | `1` if upscaling is enabled, `0` otherwise.                                                     |
+| `SR_SHOULD_APPLY_JITTER`    | `1` if upscaling is enabled, `0` otherwise.                                                     |
 | `SR_SCALED_WIDTH`           | Render width (scaled resolution width). Equals screen width when upscaling is disabled.          |
 | `SR_SCALED_HEIGHT`          | Render height (scaled resolution height). Equals screen height when upscaling is disabled.       |
 | `SR_SCREEN_WIDTH`           | Screen width (display resolution width).                                                         |

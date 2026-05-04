@@ -37,7 +37,7 @@ When enabled, SR writes all internal shader code to the `debug` folder.
 
 Each file is named using the following format:
 
-```
+```text
 <shader name>.<shader type>.<graphics API>.<code type>.glsl
 ```
 

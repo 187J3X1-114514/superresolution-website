@@ -12,19 +12,19 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /Debugging-instructions
+      link: /Debugging-instructions/
     - theme: alt
       text: API Reference
-      link: /Mod-API-Documentation
+      link: /Mod-API-Documentation/
 
 features:
   - title: For Mod Developers
-    details: Learn how to integrate Super Resolution into your mod, use the API, and debug common issues.
-    link: /Mod-API-Documentation
+    details: Learn how to use the Super Resolution API.
+    link: /Mod-API-Documentation/
   - title: For Shaderpack Developers
     details: Understand the shaderpack interface, motion vectors, jittered color buffers, and temporal upsampling integration.
-    link: /Shaderpack-Interface-documentation
+    link: /Shaderpack-Interface-documentation/
   - title: Debugging & Diagnostics
     details: Find help with configuration, native libraries, shader compilation errors, and dumped shader code.
-    link: /Debugging-instructions
+    link: /Debugging-instructions/
 ---

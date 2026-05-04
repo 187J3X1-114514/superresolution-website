@@ -41,52 +41,6 @@
     </header>
 </template>
 
-<script lang="ts">
-import {defineComponent, onMounted} from 'vue';
-import {gsap} from 'gsap';
-import {ScrollToPlugin} from 'gsap/ScrollToPlugin';
-
-gsap.registerPlugin(ScrollToPlugin);
-
-export default defineComponent({
-    name: 'HeroSection',
-    setup() {
-        onMounted(() => {
-            const tl = gsap.timeline();
-
-            // 1. 进场动画
-            tl.from('.hero-badge', {y: -20, opacity: 0, duration: 0.8, ease: 'power3.out', delay: 0.2})
-                .from('.hero-title', {
-                    duration: 1.2,
-                    y: 50,
-                    opacity: 0,
-                    clipPath: 'inset(100% 0 0 0)',
-                    ease: 'expo.out'
-                }, '-=0.4')
-                .from('.hero-right', {scale: 0.8, x: 50, opacity: 0, duration: 1.5, ease: 'expo.out'}, '-=1.0')
-                .from('.hero-desc', {y: 20, opacity: 0, duration: 0.8}, '-=0.8')
-                .from('.btn-group .btn', {
-                    y: 18,
-                    opacity: 0,
-                    stagger: 0.15,
-                    duration: 0.55,
-                    ease: 'power3.out'
-                }, '-=0.5');
-
-            // 滚动逻辑
-            const learnMoreBtn = document.getElementById('learn-more-btn');
-            if (learnMoreBtn) {
-                learnMoreBtn.addEventListener('click', () => {
-                    gsap.to(window, {duration: 1.2, scrollTo: {y: '#overview', offsetY: 40}, ease: 'power4.inOut'});
-                });
-            }
-        });
-
-        return {};
-    }
-});
-</script>
-
 <style scoped>
 header {
     min-height: 100vh;
@@ -112,6 +66,9 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
+    opacity: 0;
+    transform: translateX(50px) scale(0.8);
+    animation: heroGraphicEnter 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards;
 }
 
 /* 文字样式保持一致但微调间距 */
@@ -127,6 +84,9 @@ header {
     text-transform: uppercase;
     margin-bottom: 24px;
     backdrop-filter: blur(10px);
+    opacity: 0;
+    transform: translateY(-20px);
+    animation: heroFadeDown 0.8s ease-out 0.2s forwards;
 }
 
 .hero-title {
@@ -136,6 +96,10 @@ header {
     margin-bottom: 20px;
     text-transform: uppercase;
     letter-spacing: -1px;
+    opacity: 0;
+    transform: translateY(50px);
+    clip-path: inset(100% 0 0 0);
+    animation: heroTitleReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
 }
 
 .hero-title span {
@@ -147,6 +111,9 @@ header {
     color: var(--clr-text-muted);
     max-width: 550px;
     margin-bottom: 40px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: heroFadeUp 0.8s ease-out 0.8s forwards;
 }
 
 /* Logo 视觉区域 */
@@ -228,6 +195,17 @@ header {
     overflow: visible;
     transition: color 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     z-index: 1;
+    opacity: 0;
+    transform: translateY(18px);
+    animation: heroFadeUp 0.55s ease-out forwards;
+}
+
+.btn-group .btn:first-child {
+    animation-delay: 0.95s;
+}
+
+.btn-group .btn:last-child {
+    animation-delay: 1.1s;
 }
 
 /* 2. 边框层 */
@@ -292,9 +270,33 @@ header {
     transition: filter 0.45s cubic-bezier(0.86, 0, 0.07, 1);
 }
 
-/* 修复针对“架构导览”虚线的特殊处理 */
-#learn-more-btn::before {
-    border-style: dashed;
+@keyframes heroFadeDown {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes heroFadeUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes heroTitleReveal {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+@keyframes heroGraphicEnter {
+    to {
+        opacity: 1;
+        transform: translateX(0) scale(1);
+    }
 }
 
 /* 响应式调整 */

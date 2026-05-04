@@ -130,6 +130,7 @@ QualityPreset preset = new QualityPreset()
 
 > [!NOTE]
 > `LevelRenderStart` / `LevelRenderEnd` 的确切触发点可能会受到捕获模式的影响。
+
 ---
 
 ## 6. 需求系统（`api.utils.Requirement`）

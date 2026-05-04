@@ -85,7 +85,7 @@
                 </div>
             </a>
 
-            <a href="https://sr-docs.187j3x1-114514.org" target="_blank" class="link-card">
+            <a href="/docs/" class="link-card">
                 <div class="card-icon docs-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" focusable="false"
                          viewBox="0 0 12 12">

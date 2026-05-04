@@ -130,6 +130,7 @@ The following events can be subscribed to via `SuperResolutionAPI.EVENT_BUS`:
 
 > [!NOTE]
 > The exact trigger points of `LevelRenderStart` / `LevelRenderEnd` may be affected by capture mode.
+
 ---
 
 ## 6. Requirement System (`api.utils.Requirement`)

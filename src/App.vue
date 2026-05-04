@@ -1,6 +1,4 @@
 <script lang="ts">
-import RGBLogo from './components/RGBLogo.vue'
-import typingText from './components/typingText.vue'
 import BackgroundEffects from './components/BackgroundEffects.vue'
 import HeroSection from './components/HeroSection.vue'
 import AlgorithmsGrid from './components/AlgorithmsGrid.vue'
@@ -14,8 +12,6 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   name: 'App',
   components: {
-    RGBLogo,
-    typingText,
     BackgroundEffects,
     HeroSection,
     AlgorithmsGrid,
