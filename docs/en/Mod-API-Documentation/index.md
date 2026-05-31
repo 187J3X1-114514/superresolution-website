@@ -27,7 +27,7 @@ SuperResolutionAPI.EVENT_BUS.addListener((LevelRenderStartEvent event) -> {
 ```
 
 
-## 3. Custom Upscaling Algorithm
+## 3. Custom Super Resolution Algorithm
 
 ### 3.1 Extending `AbstractAlgorithm`
 

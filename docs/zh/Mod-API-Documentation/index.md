@@ -198,4 +198,4 @@ QualityPreset preset = new QualityPreset()
 
 - `ResourcesProgressListener` — 下载进度回调
 - `ResourcesFinishListener` — 下载完成回调
-- `ResourcesErrorListener` — Download error callback
+- `ResourcesErrorListener` — 下载错误回调

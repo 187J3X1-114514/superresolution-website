@@ -6,6 +6,8 @@ import AlgorithmCard from './components/AlgorithmCard.vue'
 import VersionGroups from './components/VersionGroups.vue'
 import IssueCard from './components/IssueCard.vue'
 import LinkCards from './components/LinkCards.vue'
+import DownloadCard from './components/DownloadCard.vue'
+import NightlyModal from './components/NightlyModal.vue'
 import type { VersionInfo } from './components/VersionGroups.vue';
 import { defineComponent } from 'vue'
 
@@ -18,10 +20,13 @@ export default defineComponent({
     AlgorithmCard,
     VersionGroups,
     IssueCard,
-    LinkCards
+    LinkCards,
+    DownloadCard,
+    NightlyModal
   },
   data() {
     return {
+      showNightly: false,
       algoList: [
         {
           "title": "AMD FSR 1",
@@ -172,7 +177,11 @@ export default defineComponent({
         <VersionGroups :versions="versionList" />
 
         <IssueCard />
-        
+
+        <DownloadCard @open-nightly="showNightly = true" />
+
+        <NightlyModal :visible="showNightly" @close="showNightly = false" />
+
         <LinkCards />
       </main>
 

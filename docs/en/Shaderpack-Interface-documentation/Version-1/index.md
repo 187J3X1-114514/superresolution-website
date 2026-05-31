@@ -7,29 +7,29 @@ title: "Shader Pack Integration Guide"
 **Schema Version: 1**
 
 This guide explains how to integrate SR (Super Resolution) into your shader pack.
-SR as a **plugin** for your traditional rendering pipeline — it does not take over or modify how the game renders.
+SR acts as a **plugin** — it does not take over or modify how the game renders, but simply adds super resolution capability to Iris's (or other shader loaders', though only Iris is currently supported) rendering pipeline.
 You only need to understand what data SR reads and where it writes the result.
 
 
 ## How SR Works
 
-SR does **not** change the game's rendering resolution. The game always renders at full screen resolution.
+SR does **not** change the game's rendering resolution. The game always renders at screen resolution.
 
-Resolution scaling is handled **entirely by your shader pack** (e.g., through buffer scale directives).
-SR simply plugs into your composite pipeline at a point you choose, reads your inputs, performs upscaling, and writes the result back.
+Resolution scaling is entirely controlled by **your shader pack** (e.g., through buffer scale directives).
+SR simply plugs into your composite pipeline at a point you choose, reads your inputs, performs super resolution, and writes the result back.
 
 Here is the flow:
 
-1. Your shader renders the scene. Resolution scaling (if any) is managed by your shader.
+1. Your shader renders the scene normally. Resolution scaling is managed by your shader.
 2. At a composite pass you specify, SR activates.
 3. SR reads color, depth, and motion vectors from your buffers.
-4. SR upscales the image.
-5. SR writes the upscaled result back to the buffer(s) you specify.
+4. SR performs super resolution upscaling.
+5. SR writes the upscaled result back to the buffer you specify.
 6. Your shader continues with subsequent passes.
 
 If the configuration file is missing, malformed, or the shader interface is disabled, SR does nothing — your shader runs as if SR does not exist.
 
-> **Key point:** SR is a plugin. It adds upscaling capability to your existing pipeline.
+> **Key point:** SR is a plugin. It adds super resolution capability to your existing pipeline.
 > It does not control rendering resolution, and it does not replace any of your passes.
 
 ## Part I — Quick Start
@@ -51,6 +51,14 @@ Create a file named `superresolution.json` and place it in the root of your shad
       "upscale": {
         "enabled": true,
         "internal_format": "r11g11b10f",
+        "auto_exposure": true,
+        "hdr": true,
+        "motion_jittered": false,
+        "pre_exposure": {
+            "source": "const",
+            "type": "float",
+            "value": 1.0
+        },
         "trigger": {
           "type": "AFTER",
           "pass": "composite1"
@@ -91,9 +99,7 @@ In the composite passes **before** the trigger point, make sure:
 
 - Your **color** buffer contains the rendered scene (at your scaled resolution).
 - Your **depth** buffer is available.
-- Your **motion vectors** buffer is written with per-pixel motion in UV space.
-
-That's it. SR handles the rest.
+- Your **motion vectors** buffer is written with motion vectors.
 
 ## Part II — Configuration Reference
 
@@ -105,7 +111,7 @@ When a dimension loads, SR looks for a matching profile:
 
 1. First, it checks for an exact match (e.g., `"0"` for Overworld).
 2. If none is found, it falls back to `"*"`.
-3. If neither exists, upscaling is disabled for that dimension.
+3. If neither exists, super resolution is disabled for that dimension.
 
 | Key    | Dimension        |
 |--------|------------------|
@@ -137,7 +143,7 @@ Choose the trigger point based on your pipeline:
 
 ### Inputs
 
-SR requires **three** inputs. All three must be provided and enabled. If any input is missing or disabled, upscaling will not run for that frame.
+SR requires **three** inputs. All three must be provided and enabled. If any input is missing or disabled, super resolution will not run for that frame.
 
 ```json
 "inputs": {
@@ -163,17 +169,19 @@ SR requires **three** inputs. All three must be provided and enabled. If any inp
 |--------------------|----------------------------------------------------|
 | `color`            | The rendered scene color at your scaled resolution. |
 | `depth`            | The depth buffer.                                   |
+| `exposure`         | Exposure value, a 1×1 texture.                      |
 | `motion_vectors`   | Per-pixel motion vectors in UV space (RG channels). |
 
 **`src`** can be any of the following texture names:
 
-| Name                        | Description                       |
-|-----------------------------|-----------------------------------|
-| `colortex0` – `colortex31`  | Color buffer attachments          |
-| `alttex0` – `alttex31`      | Alternate (flip) texture variants |
-| `depthtex`                  | Main depth texture                |
-| `noHandDepthtex`            | Depth texture without hand        |
-| `noTranslucentDepthtex`     | Depth texture without translucents|
+| Name                            | Description                                                           |
+|---------------------------------|-----------------------------------------------------------------------|
+| `colortex0` – `colortex31`      | Color textures                                                        |
+| `alttex0` – `alttex31`          | Color texture variants, pointing to alt textures instead of main textures |
+| `autotex0` – `autotex31`        | Color texture variants, automatically handling alt vs. main read/write |
+| `depthtex`                      | Main depth texture                                                    |
+| `noHandDepthtex`                | Depth texture without hand                                            |
+| `noTranslucentDepthtex`         | Depth texture without translucent objects                             |
 
 
 ### Region
@@ -218,7 +226,6 @@ The `"outputs"` section must contain exactly one key: `"upscaled_color"`.
 - `"target"` — A list of buffer names to write the upscaled result to. If multiple targets are specified, the result is written to each one in order. All targets must have the same dimensions.
 - The output is always at **screen resolution**.
 - The output is always **de-jittered** (jitter is removed automatically).
-- The color space remains **SDR**.
 
 
 ### Internal Format
@@ -233,24 +240,112 @@ Supported values:
 
 | Value         | Format       |
 |---------------|--------------|
-| `r11g11b10f`  | R11G11B10F (default) |
+| `r11g11b10f`  | R11G11B10F |
 | `rgba8`       | RGBA8        |
 | `rgba16f`     | RGBA16F      |
 
-If omitted or unrecognized, defaults to `R11G11B10F`.
+If omitted or unrecognized, defaults to `RGBA16F`, but it is strongly recommended to specify this explicitly, as the default format may differ across SR versions. Also, SR allows the user to manually override this setting (even when the shaderpack specifies it explicitly).
+
+
+### Pre-exposure
+
+```json
+"pre_exposure": {
+    "source": "const",
+    "type": "float",
+    "value": 1.0
+}
+```
+
+- **Optional field**.
+- **Only accepts type**: `float`.
+- **Default value**: `1.0`.
+- `source` should be `"const"`, `"variable"`, or `"uniform"`.
+- When `source == "const"`, `value` must be a number;
+- When `source == "variable"` or `source == "uniform"`, `value` must be a non-empty string (the variable/uniform name).
+
+
+### HDR Input/Output
+
+```json
+"hdr": true
+```
+
+- **Type**: `boolean`
+- **Default**: `false`
+- Whether to process input color with an HDR pipeline. When enabled, SR uses a higher dynamic range for internal computations.
+
+
+### Auto Exposure
+
+```json
+"auto_exposure": true
+```
+
+- **Type**: `boolean`
+- **Default**: `false`
+- Enables automatic exposure computation.
+- **Note**: If the `exposure` texture input is also enabled in `inputs`, the parser ignores `auto_exposure = true` and logs a warning (the `exposure` texture takes precedence).
+
+
+### Motion Vector Jittered
+
+```json
+"motion_jittered": false
+```
+
+- **Type**: `boolean`
+- **Default**: `false`
+- Indicates whether the motion vectors already include jitter information.
+- When set to `true`, the motion vectors are considered to already account for subpixel jitter offsets, and SR will not perform additional jitter-related motion vector correction.
+- When set to `false` (default), SR assumes the motion vectors correspond to un-jittered sample positions.
 
 
 ### Jitter
 
+When enabled, SR generates subpixel jitter offsets each frame. Your shader can read the jitter values through the provided uniforms (see below) and apply them to the projection matrix.
+
 ```json
 "jitter": {
-  "enabled": true
+    "enabled": true,
+    "source": "mod",
+    "source_config": {
+        "jitter_offset": {
+            "source": "uniform",
+            "type": "vector2f",
+            "value": "taa_jitter_offset"
+        },
+        "jitter_sequence_length": {
+            "source": "const",
+            "type": "int",
+            "value": 8
+        }
+    }
 }
 ```
 
-When enabled, SR generates subpixel jitter offsets each frame. Your shader can read the jitter values through the provided uniforms (see below) and apply them to the projection matrix.
+Corresponding `shaders.properties` configuration:
 
-If the active upscaling algorithm does not support jitter, jitter simply won't be applied — no error occurs, and your shader runs normally.
+```properties
+variable.vec2.taa_jitter_offset=vec2(0.1,0.2)
+# uniform.vec2.taa_jitter_offset=vec2(0.1,0.2)
+```
+
+The table below explains the fields from the JSON example above:
+
+| Field                                            | Type / Example                              | Description                                                                                                                                                                                                                      |
+| ------------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source`                                         | `"mod"` / `"shaderpack"`                 | Optional, default `"mod"` (SR generates jitter). If `"shaderpack"`, the shaderpack provides jitter; only in this mode does `source_config` take effect. This mode is experimental.                                       |
+| `source_config.jitter_offset.source`             | `const` / `variable` / `uniform`             | Specifies the source type for `jitter_offset`.                                                                                                                                                                               |
+| `source_config.jitter_offset.type`               | `vector2f`                                   | Must be `vector2f`, representing the X and Y components of the jitter value.                                                                                                                                                 |
+| `source_config.jitter_offset.value`              | e.g. `taa_jitter_offset` or `[0.0, 0.0]`     | If `source` is `uniform`/`variable`, this is the uniform/variable name; for `const`, it is a constant array; for `variable`, it is a shaderpack variable name (the shaderpack is responsible for updating it).     |
+| `source_config.jitter_sequence_length.source`    | `const` / `variable` / `uniform`             | Specifies the source type for the sequence length.                                                                                                                                                                               |
+| `source_config.jitter_sequence_length.type`      | `int`                                        | Must be `int`, representing the jitter sequence length.                                                                                                                                                                      |
+| `source_config.jitter_sequence_length.value`     | e.g. `8`                                     | If `source` is `const`, this is an integer; if `uniform`/`variable`, this is a name.                                                                                                                                        |
+
+* Jitter value X, Y ∈ [-0.5, 0.5]
+* If the currently active upscaling algorithm does not support jitter, jitter will not be applied — no error occurs, and the shader runs normally.
+* For some algorithms, you need to manually flip the jitter Y axis. These algorithms include `DLSS`, `XeSS`, and `FSR`. You can use the `SR_USING_ALGO` macro to detect the currently active algorithm.
 
 
 ## Part III — Motion Vectors
@@ -260,12 +355,18 @@ Your shader **must** provide motion vectors. SR does not generate them for you.
 Motion vectors must:
 
 - Be stored in the **RG channels** of the source texture.
-- Be in **UV space** (normalized 0–1 coordinates).
+- Be in **UV space** (normalized −1 to 1 coordinates).
 - Be computed as:
 
 ```text
-motion = previous_uv - current_uv
+motion_vector = current_uv - previous_uv
+// motion_vector.x, motion_vector.y ∈ [-1.0, 1.0]
 ```
+
+For example, if a pixel's motion vector value is (-1.0, -0.5), this means:
+
+* The pixel's position in the previous frame was offset to the right by the entire screen width relative to the current frame
+* The pixel's position in the previous frame was offset upward by half the screen height relative to the current frame
 
 Where UV coordinates are based on the **render resolution** (your scaled resolution).
 
@@ -295,6 +396,11 @@ When SR is installed and a shader pack includes a valid `superresolution.json`, 
 | `SR_SCALED_HEIGHT`          | Render height (scaled resolution height). Equals screen height when upscaling is disabled.       |
 | `SR_SCREEN_WIDTH`           | Screen width (display resolution width).                                                         |
 | `SR_SCREEN_HEIGHT`          | Screen height (display resolution height).                                                       |
+| `SR_JITTER_SEQUENCE_LENGTH` | The length of the current jitter sequence (if jitter is enabled). `0` if jitter is unsupported or disabled. |
+| `SR_RENDER_SCALE_FACTOR`    | The current render scale factor (e.g., `0.5` for 50% scale). `1.0` when upscaling is disabled.    |
+| `SR_UPSCALE_RATIO`          | The current upscale ratio (screen / render). `1.0` when upscaling is disabled.                     |
+| `SR_DLSS_RENDERPRESET`      | Integer ID of the current DLSS render preset (e.g., `SR_ALGO_DLSS_RENDERPRESET_J`). `0` if the active algorithm is not DLSS or upscaling is disabled. |
+| `SR_ALGO_DLSS_RENDERPRESET_<PRESET>` | Integer ID for each registered DLSS render preset (e.g., `SR_ALGO_DLSS_RENDERPRESET_F`). Useful for comparing with `SR_DLSS_RENDERPRESET`. Current presets: `K`, `J`, `F`, `L`, `M`. |
 
 ### Uniforms
 
@@ -309,6 +415,11 @@ When SR is installed and a shader pack includes a valid `superresolution.json`, 
 | `SROriginalViewportSizeI`   | `ivec2`   | Screen resolution as `ivec2(width, height)`.                                                      |
 | `SRJitterOffset`            | `vec2`    | Current frame's jitter offset in pixel space. `vec2(0)` if jitter is unsupported or disabled.     |
 | `SRPreviousJitterOffset`    | `vec2`    | Previous frame's jitter offset in pixel space. `vec2(0)` if jitter is unsupported or disabled.    |
+| `SRFrameCount`              | `int`     | The current frame count.                                                                           |
+
+Note:
+
+* Avoid using the `SR_SCALED_WIDTH`, `SR_SCALED_HEIGHT`, `SR_SCREEN_WIDTH`, and `SR_SCREEN_HEIGHT` macros in `shaders.properties`, as they do not update when the game window is resized. Use `SR_UPSCALE_RATIO` or `SR_RENDER_SCALE_FACTOR` instead — these trigger a shaderpack reload when changed.
 
 When upscaling is disabled:
 - Scale values behave as `1.0`.
@@ -327,8 +438,8 @@ SR is designed to never break your shader pipeline.
 | JSON is malformed                      | SR disables completely.                      |
 | `schema_version` is missing            | SR disables completely.                      |
 | `schema_version` is unsupported        | SR disables completely.                      |
-| No matching profile for current dimension | Upscaling is disabled for that dimension. |
-| A required input is missing or disabled | That frame skips upscaling.                 |
+| No matching profile for current dimension | Super resolution is disabled for that dimension. |
+| A required input is missing or disabled | That frame skips super resolution.           |
 | Algorithm does not support jitter      | Jitter is not applied. No error.            |
 
 SR will log warnings when configuration issues are detected, but it will never crash or corrupt the rendering pipeline.

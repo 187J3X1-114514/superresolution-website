@@ -4,6 +4,6 @@ title: "About"
 
 # About
 
-Almost all temporal upsampling algorithms require motion vector input and a jittered color buffer, but these are difficult to implement in Minecraft. Therefore, we provide an interface for Shaderpack to provide these.
+Almost all temporal super resolution algorithms require motion vector input and a jittered color buffer, but these are difficult to implement/acquire in Minecraft. Therefore, we provide an interface for shader packs to provide these themselves.
 
-We have reserved a `schema_version` field for the interface, which is used to specify the version of the interface configuration file.
+A `schema_version` field is reserved in the interface, used to identify the version of the interface configuration file.
