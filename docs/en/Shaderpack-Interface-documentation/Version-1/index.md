@@ -1,4 +1,8 @@
-# Shader Pack Integration Guide
+---
+title: "Shader Pack Integration Guide"
+---
+
+# Shader Pack Integration Guide <Badge type="tip" text="v1" />
 
 **Schema Version: 1**
 
@@ -6,7 +10,6 @@ This guide explains how to integrate SR (Super Resolution) into your shader pack
 SR as a **plugin** for your traditional rendering pipeline — it does not take over or modify how the game renders.
 You only need to understand what data SR reads and where it writes the result.
 
----
 
 ## How SR Works
 
@@ -28,8 +31,6 @@ If the configuration file is missing, malformed, or the shader interface is disa
 
 > **Key point:** SR is a plugin. It adds upscaling capability to your existing pipeline.
 > It does not control rendering resolution, and it does not replace any of your passes.
-
----
 
 ## Part I — Quick Start
 
@@ -94,8 +95,6 @@ In the composite passes **before** the trigger point, make sure:
 
 That's it. SR handles the rest.
 
----
-
 ## Part II — Configuration Reference
 
 ### Profiles
@@ -118,8 +117,6 @@ When a dimension loads, SR looks for a matching profile:
 > Dimension keys are determined by the shader pack's own dimension mapping
 > (the same mapping Iris uses via `dimension.world0`, etc.).
 
----
-
 ### Trigger
 
 ```json
@@ -137,8 +134,6 @@ When a dimension loads, SR looks for a matching profile:
 Choose the trigger point based on your pipeline:
 - The pass **before** the trigger should have finished writing color, depth, and motion vectors.
 - The pass **after** the trigger can read the upscaled result at full screen resolution.
-
----
 
 ### Inputs
 
@@ -180,13 +175,12 @@ SR requires **three** inputs. All three must be provided and enabled. If any inp
 | `noHandDepthtex`            | Depth texture without hand        |
 | `noTranslucentDepthtex`     | Depth texture without translucents|
 
----
 
 ### Region
 
 The `"region"` field specifies which part of a texture to read from or write to:
 
-```
+```text
 "region": [X, Y, W, H]
 ```
 
@@ -206,7 +200,6 @@ If `"region"` is omitted, it defaults to `[0, 0, -1, -1]` (full render resolutio
 - Input regions use `-1` (render resolution) because your shader rendered at scaled resolution.
 - Output regions use `-2` (screen resolution) because the upscaled result is at full resolution.
 
----
 
 ### Output
 
@@ -227,7 +220,6 @@ The `"outputs"` section must contain exactly one key: `"upscaled_color"`.
 - The output is always **de-jittered** (jitter is removed automatically).
 - The color space remains **SDR**.
 
----
 
 ### Internal Format
 
@@ -247,7 +239,6 @@ Supported values:
 
 If omitted or unrecognized, defaults to `R11G11B10F`.
 
----
 
 ### Jitter
 
@@ -261,7 +252,6 @@ When enabled, SR generates subpixel jitter offsets each frame. Your shader can r
 
 If the active upscaling algorithm does not support jitter, jitter simply won't be applied — no error occurs, and your shader runs normally.
 
----
 
 ## Part III — Motion Vectors
 
@@ -273,7 +263,7 @@ Motion vectors must:
 - Be in **UV space** (normalized 0–1 coordinates).
 - Be computed as:
 
-```
+```text
 motion = previous_uv - current_uv
 ```
 
@@ -284,7 +274,6 @@ Important:
 - Do **not** convert to NDC.
 - SR internally handles any coordinate space conversions required by the active algorithm.
 
----
 
 ## Part IV — Shader Macros and Uniforms
 
@@ -299,9 +288,9 @@ When SR is installed and a shader pack includes a valid `superresolution.json`, 
 | `SR_DISABLE`                | Inverse of `SR_ENABLE`.                                                                          |
 | `SR_USING_ALGO`             | Integer ID of the currently active algorithm. `0` if upscaling is disabled.                      |
 | `SR_ALGO_<NAME>`            | Integer ID for each registered algorithm (e.g., `SR_ALGO_FSR2`). Useful for comparing with `SR_USING_ALGO`. |
-| `SR_ALGO_SUPPORTS_JITTER`  | `1` if the active algorithm supports jitter, `0` otherwise.                                      |
-| `SR_SHOULD_APPLY_SCALE`    | `1` if upscaling is enabled, `0` otherwise.                                                     |
-| `SR_SHOULD_APPLY_JITTER`   | `1` if upscaling is enabled, `0` otherwise.                                                     |
+| `SR_ALGO_SUPPORTS_JITTER`   | `1` if the active algorithm supports jitter, `0` otherwise.                                      |
+| `SR_SHOULD_APPLY_SCALE`     | `1` if upscaling is enabled, `0` otherwise.                                                     |
+| `SR_SHOULD_APPLY_JITTER`    | `1` if upscaling is enabled, `0` otherwise.                                                     |
 | `SR_SCALED_WIDTH`           | Render width (scaled resolution width). Equals screen width when upscaling is disabled.          |
 | `SR_SCALED_HEIGHT`          | Render height (scaled resolution height). Equals screen height when upscaling is disabled.       |
 | `SR_SCREEN_WIDTH`           | Screen width (display resolution width).                                                         |
@@ -327,7 +316,6 @@ When upscaling is disabled:
 - `SR_USING_ALGO` is `0`.
 - `SR_SCALED_WIDTH` / `SR_SCALED_HEIGHT` equal the screen dimensions.
 
----
 
 ## Part V — Error Handling
 
@@ -345,7 +333,6 @@ SR is designed to never break your shader pipeline.
 
 SR will log warnings when configuration issues are detected, but it will never crash or corrupt the rendering pipeline.
 
----
 
 ## Full Example
 
