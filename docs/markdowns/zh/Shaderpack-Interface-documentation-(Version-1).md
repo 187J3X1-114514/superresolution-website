@@ -372,14 +372,14 @@ variable.vec2.taa_jitter_offset=vec2(0.1,0.2)
 - 计算方式：
 
 ```
-motion_vector = previous_uv - current_uv
+motion_vector = current_uv - previous_uv
 // motion_vector.x，motion_vector.y ∈ [-1.0,1.0]
 ```
 
 假设某像素的运动矢量值为(-1.0,-0.5)，这相当于：
 
-* 该像素前一帧相对于当前帧向左偏移了 整个屏幕宽度
-* 该像素前一帧相对于当前帧向上偏移了 半个屏幕高度
+* 该像素在前一帧的位置，相对于当前帧向右偏移了整个屏幕宽度
+* 该像素在前一帧的位置，相对于当前帧向上偏移了半个屏幕高度
 
 其中 UV 坐标基于**渲染分辨率**（你的缩放分辨率）。
 
