@@ -450,7 +450,7 @@ variable.vec2.taa_jitter_offset=vec2(0.1,0.2)
 从 Schema version 2 开始，你可以在配置文件中使用宏。支持的宏与 `shaders.properties` 中定义的等效（不包括 `shaders.properties` 中新定义的宏）。
 
 ::: warning
-事实上模组会对任意一个版本的配置进行宏预处理，但为了兼容性，请不要在 v2 以下的版本使用宏。
+事实上模组会对任意版本的配置进行宏预处理，但为了兼容性，请不要在 v2 以下的版本使用宏。
 :::
 
 
