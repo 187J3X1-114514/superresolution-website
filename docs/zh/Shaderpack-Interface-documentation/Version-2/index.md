@@ -2,7 +2,7 @@
 title: "光影包集成指南"
 ---
 
-# 光影包集成指南 <Badge type="warning" text="0.8.3-alpha.1 ~ latest" /> <Badge type="tip" text="v1" />
+# 光影包集成指南 <Badge type="warning" text="0.8.3-alpha.4 ~ latest" /> <Badge type="tip" text="v2" />
 
 本指南主要介绍如何在你的光影包中集成 SR（Super Resolution，超分辨率）。
 SR 作为一个**插件**——它不会接管或修改游戏的渲染方式，只是为Iris（或是其它光影加载器，尽管现在只支持Iris）的渲染管线添加了超分辨率功能。
@@ -43,7 +43,7 @@ SR 是一个插件。它为你现有的管线添加超分辨率能力。
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "profiles": {
     "*": {
         "jitter": {
@@ -351,8 +351,107 @@ variable.vec2.taa_jitter_offset=vec2(0.1,0.2)
 
 * 抖动值.X,抖动值.Y∈[-0.5,0.5]
 * 如果当前激活的超分算法不支持抖动，那么抖动不会被应用，不会产生错误，光影正常运行。
-* 由于一些原因，在使用某些算法时你需要手动翻转抖动的Y轴，这些算法有 `DLSS` `XeSS` `FSR`，你可以使用 `SR_USING_ALGO`
-  宏来检测当前使用的算法。
+
+
+### 自定义（Customs）
+
+`customs` 字段位于 `upscale` 下，是一个通用扩展字段，用于提供算法相关的自定义配置。
+
+```json
+"customs": {
+    "motion_vector_preprocessing_function": "<GLSL 函数代码>"
+}
+```
+
+#### motion_vector_preprocessing_function
+
+允许在运动矢量输入到超分算法前执行自定义 GLSL 预处理。
+
+**限制：**
+
+- 必须包含一个签名为 `vec2 motionVectorPreprocessing(vec2)` 的函数
+- 函数的 `vec2` 参数是运动矢量，返回值是预处理后的运动矢量
+
+**行为差异：**
+
+- **FSR / DLSS / XeSS**：传入函数的运动矢量已经被翻转 Y 轴（等价于 `mv * vec2(1.0, -1.0)`）。函数代码会被注入到 `process_input_textures.comp` 中，在运动矢量处理逻辑中调用：
+
+  ```glsl
+  #ifdef HAS_MOTION_VECTOR
+  layout(binding = 4) uniform sampler2D inputMotionVectors;
+  layout(binding = 5, rg16f) uniform writeonly image2D outputMotionVectors;
+  #endif
+
+  // ...
+
+  void main() {
+      // ...
+      #ifdef HAS_MOTION_VECTOR
+      vec2 mv = texelFetch(inputMotionVectors, ivec2(texelCoord.x, flippedY), 0).rg;
+      mv.y = -mv.y;
+      #ifdef MOTION_VECTOR_PREPROCESSING_FUNCTION_INJECTED
+      mv = motionVectorPreprocessing(mv);
+      #endif
+      imageStore(outputMotionVectors, texelCoord, vec4(mv, 0.0, 0.0));
+      #endif
+      // ...
+  }
+  ```
+
+- **其他算法**：传入函数的运动矢量是原始数据（未经任何变换）。函数会在一个独立的 compute pass 中执行：
+
+  ```glsl
+  #version 430 core
+
+  layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+  layout(binding = 0) uniform sampler2D inputMotionVectors;
+  layout(binding = 1, rg16f) uniform writeonly image2D outputMotionVectors;
+
+  // MOTION_VECTOR_PREPROCESSING_FUNCTION_PLACEHOLDER
+
+  void main() {
+      ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+      ivec2 texSize = imageSize(outputMotionVectors);
+      if (texelCoord.x < texSize.x && texelCoord.y < texSize.y) {
+          vec2 mv = texelFetch(inputMotionVectors, texelCoord, 0).rg;
+          #ifdef MOTION_VECTOR_PREPROCESSING_FUNCTION_INJECTED
+          mv = motionVectorPreprocessing(mv);
+          #endif
+          imageStore(outputMotionVectors, texelCoord, vec4(mv, 0.0, 0.0));
+      }
+  }
+  ```
+
+**使用示例：**
+
+```json
+{
+  "schema_version": 2,
+  "profiles": {
+    "*": {
+      "upscale": {
+        "customs": {
+          "motion_vector_preprocessing_function": "vec2 motionVectorPreprocessing(vec2 motionVector) { return vec2(0.0); }"
+        }
+      }
+    }
+  }
+}
+```
+
+::: tip
+你可以配合宏（如 `#if SR_USING_ALGO == SR_ALGO_FSR`）按算法条件性地启用预处理函数。
+:::
+
+
+### 配置中的宏
+
+从 Schema version 2 开始，你可以在配置文件中使用宏。支持的宏与 `shaders.properties` 中定义的等效（不包括 `shaders.properties` 中新定义的宏）。
+
+::: warning
+事实上模组会对任意一个版本的配置进行宏预处理，但为了兼容性，请不要在 v2 以下的版本使用宏。
+:::
 
 
 ## 第三部分 — 运动矢量
@@ -394,6 +493,9 @@ motion_vector = current_uv - previous_uv
 | 宏                                     | 说明                                                                                                                                                               |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `SR_INSTALLED`                         | SR 已安装时始终为 `1`。                                                                                                                                             |
+| `SR_CONFIG_SCHEMA_VERSION`          | 当前接口配置文件的版本，例如 `2`、`114514`。                                                                                                                        |
+| `SR_UPSCALE_RATIO_HALF`                | 等于 0.5 的上采样比例。                                                                                                                                             |
+| `SR_RENDER_SCALE_FACTOR_HALF`          | 等于 0.5 的渲染缩放因子。                                                                                                                                           |
 | `SR_ENABLE`                            | 超分启用时为 `1`，否则为 `0`。                                                                                                                                      |
 | `SR_DISABLE`                           | `SR_ENABLE` 的反义。                                                                                                                                                |
 | `SR_USING_ALGO`                        | 当前激活算法的整数 ID。超分禁用时为 `0`。                                                                                                                           |

@@ -107,7 +107,9 @@ QualityPreset preset = new QualityPreset()
 - `getDescriptionByID(String id)`：通过 `codeName` 查找描述。
 - `isAlgorithmSupported(AlgorithmDescription<?>)`：检查并缓存算法可用性（基于 `Requirement.check()`）。
 
-> **注意：** 注册表在静态初始化期间执行内置算法注册，之后会触发 `AlgorithmRegisterEvent`。如果你想注册自定义算法，请监听此事件。
+::: info
+注册表在静态初始化期间执行内置算法注册，之后会触发 `AlgorithmRegisterEvent`。如果你想注册自定义算法，请监听此事件。
+:::
 
 
 ## 5. 事件（`api.event`）

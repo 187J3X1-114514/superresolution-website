@@ -2,9 +2,9 @@
 title: "Shader Pack Integration Guide"
 ---
 
-# Shader Pack Integration Guide <Badge type="warning" text="0.8.3-alpha.1 ~ latest" /> <Badge type="tip" text="v1" />
+# Shader Pack Integration Guide <Badge type="warning" text="0.8.3-alpha.4 ~ latest" /> <Badge type="tip" text="v2" />
 
-**Schema Version: 1**
+**Schema Version: 2**
 
 This guide explains how to integrate SR (Super Resolution) into your shader pack.
 SR acts as a **plugin** — it does not take over or modify how the game renders, but simply adds super resolution capability to Iris's (or other shader loaders', though only Iris is currently supported) rendering pipeline.
@@ -44,7 +44,7 @@ Create a file named `superresolution.json` and place it in the root of your shad
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "profiles": {
     "*": {
       "jitter": {
@@ -347,7 +347,107 @@ The table below explains the fields from the JSON example above:
 
 * Jitter value X, Y ∈ [-0.5, 0.5]
 * If the currently active upscaling algorithm does not support jitter, jitter will not be applied — no error occurs, and the shader runs normally.
-* For some algorithms, you need to manually flip the jitter Y axis. These algorithms include `DLSS`, `XeSS`, and `FSR`. You can use the `SR_USING_ALGO` macro to detect the currently active algorithm.
+
+
+### Customs
+
+The `customs` field sits under `upscale` and is a general-purpose extension field for providing algorithm-related custom configuration.
+
+```json
+"customs": {
+    "motion_vector_preprocessing_function": "<GLSL function code>"
+}
+```
+
+#### motion_vector_preprocessing_function
+
+Allows custom GLSL preprocessing of motion vectors before they are fed into the upscaling algorithm.
+
+**Constraints:**
+
+- Must contain a function with the signature `vec2 motionVectorPreprocessing(vec2)`
+- The `vec2` parameter is the motion vector, and the return value is the preprocessed motion vector
+
+**Behavioral differences:**
+
+- **FSR / DLSS / XeSS**: The motion vector passed to the function has already had its Y axis flipped (equivalent to `mv * vec2(1.0, -1.0)`). The function code is injected into `process_input_textures.comp` and called during motion vector processing:
+
+  ```glsl
+  #ifdef HAS_MOTION_VECTOR
+  layout(binding = 4) uniform sampler2D inputMotionVectors;
+  layout(binding = 5, rg16f) uniform writeonly image2D outputMotionVectors;
+  #endif
+
+  // ...
+
+  void main() {
+      // ...
+      #ifdef HAS_MOTION_VECTOR
+      vec2 mv = texelFetch(inputMotionVectors, ivec2(texelCoord.x, flippedY), 0).rg;
+      mv.y = -mv.y;
+      #ifdef MOTION_VECTOR_PREPROCESSING_FUNCTION_INJECTED
+      mv = motionVectorPreprocessing(mv);
+      #endif
+      imageStore(outputMotionVectors, texelCoord, vec4(mv, 0.0, 0.0));
+      #endif
+      // ...
+  }
+  ```
+
+- **Other algorithms**: The motion vector passed to the function is the raw data (without any transformation). The function runs in a standalone compute pass:
+
+  ```glsl
+  #version 430 core
+
+  layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+  layout(binding = 0) uniform sampler2D inputMotionVectors;
+  layout(binding = 1, rg16f) uniform writeonly image2D outputMotionVectors;
+
+  // MOTION_VECTOR_PREPROCESSING_FUNCTION_PLACEHOLDER
+
+  void main() {
+      ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+      ivec2 texSize = imageSize(outputMotionVectors);
+      if (texelCoord.x < texSize.x && texelCoord.y < texSize.y) {
+          vec2 mv = texelFetch(inputMotionVectors, texelCoord, 0).rg;
+          #ifdef MOTION_VECTOR_PREPROCESSING_FUNCTION_INJECTED
+          mv = motionVectorPreprocessing(mv);
+          #endif
+          imageStore(outputMotionVectors, texelCoord, vec4(mv, 0.0, 0.0));
+      }
+  }
+  ```
+
+**Usage example:**
+
+```json
+{
+  "schema_version": 2,
+  "profiles": {
+    "*": {
+      "upscale": {
+        "customs": {
+          "motion_vector_preprocessing_function": "vec2 motionVectorPreprocessing(vec2 motionVector) { return vec2(0.0); }"
+        }
+      }
+    }
+  }
+}
+```
+
+::: tip
+You can use macros (e.g., `#if SR_USING_ALGO == SR_ALGO_FSR`) to conditionally enable the preprocessing function per algorithm.
+:::
+
+
+### Macros in Configuration
+
+Starting from schema version 2, you can use macros in the configuration file. The available macros are equivalent to those defined in `shaders.properties` (excluding macros newly defined in `shaders.properties`).
+
+::: warning
+While the mod performs macro preprocessing on configuration files of any schema version as well, for compatibility, do not use macros in versions below v2.
+:::
 
 
 ## Part III — Motion Vectors
@@ -387,6 +487,9 @@ When SR is installed and a shader pack includes a valid `superresolution.json`, 
 | Macro                       | Description                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------------------|
 | `SR_INSTALLED`              | Always `1` when SR is installed.                                                                 |
+| `SR_CONFIG_SCHEMA_VERSION`  | The version of the current interface configuration file, e.g. `2`, `114514`.                     |
+| `SR_UPSCALE_RATIO_HALF`     | Equal to 0.5 of the upscale ratio.                                                               |
+| `SR_RENDER_SCALE_FACTOR_HALF` | Equal to 0.5 of the render scale factor.                                                       |
 | `SR_ENABLE`                 | `1` if upscaling is enabled, `0` otherwise.                                                     |
 | `SR_DISABLE`                | Inverse of `SR_ENABLE`.                                                                          |
 | `SR_USING_ALGO`             | Integer ID of the currently active algorithm. `0` if upscaling is disabled.                      |
@@ -453,7 +556,7 @@ Here is a complete `superresolution.json` with per-dimension profiles:
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "profiles": {
     "*": {
       "jitter": {

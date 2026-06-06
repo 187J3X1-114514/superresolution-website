@@ -107,7 +107,9 @@ Describes a registerable algorithm.
 - `getDescriptionByID(String id)`: Looks up a description by `codeName`.
 - `isAlgorithmSupported(AlgorithmDescription<?>)`: Checks and caches algorithm availability (based on `Requirement.check()`).
 
-> **Note:** The registry performs built-in algorithm registration during static initialization, after which `AlgorithmRegisterEvent` is fired. If you want to register a custom algorithm, listen to this event.
+::: info
+The registry performs built-in algorithm registration during static initialization, after which `AlgorithmRegisterEvent` is fired. If you want to register a custom algorithm, listen to this event.
+:::
 
 
 ## 5. Events (`api.event`)
