@@ -528,10 +528,12 @@ motion_vector = current_uv - previous_uv
 | `SRPreviousJitterOffset`    | `vec2`    | 上一帧的抖动偏移（像素空间）。不支持，未启用抖动或光影指定不从SR获取抖动时为 `vec2(0)`。   |
 | `SRFrameCount`              | `int`     | 当前帧的计数。                                                                             |
 
-注意：
+::: warning
 
-* 请避免使用在shaders.properties中使用 `SR_SCALED_WIDTH` `SR_SCALED_HEIGHT` `SR_SCREEN_WIDTH` `SR_SCREEN_HEIGHT`
+请避免使用在shaders.properties中使用 `SR_SCALED_WIDTH` `SR_SCALED_HEIGHT` `SR_SCREEN_WIDTH` `SR_SCREEN_HEIGHT`
   宏，它们在游戏窗口大小被调整时不会更新，你应该使用 `SR_UPSCALE_RATIO` 或 `SR_RENDER_SCALE_FACTOR`，它们在被更改时会重载光影包。
+
+:::
 
 超分禁用时：
 

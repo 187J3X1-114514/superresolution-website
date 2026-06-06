@@ -522,9 +522,11 @@ When SR is installed and a shader pack includes a valid `superresolution.json`, 
 | `SRPreviousJitterOffset`    | `vec2`    | Previous frame's jitter offset in pixel space. `vec2(0)` if jitter is unsupported or disabled.    |
 | `SRFrameCount`              | `int`     | The current frame count.                                                                           |
 
-Note:
+::: warning
 
-* Avoid using the `SR_SCALED_WIDTH`, `SR_SCALED_HEIGHT`, `SR_SCREEN_WIDTH`, and `SR_SCREEN_HEIGHT` macros in `shaders.properties`, as they do not update when the game window is resized. Use `SR_UPSCALE_RATIO` or `SR_RENDER_SCALE_FACTOR` instead — these trigger a shaderpack reload when changed.
+Avoid using the `SR_SCALED_WIDTH`, `SR_SCALED_HEIGHT`, `SR_SCREEN_WIDTH`, and `SR_SCREEN_HEIGHT` macros in `shaders.properties`, as they do not update when the game window is resized. Use `SR_UPSCALE_RATIO` or `SR_RENDER_SCALE_FACTOR` instead — these trigger a shaderpack reload when changed.
+
+:::
 
 When upscaling is disabled:
 - Scale values behave as `1.0`.
