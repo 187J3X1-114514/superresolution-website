@@ -1,7 +1,7 @@
 ---
 title: "V1 → V2 Changelog"
 ---
-# V1 → V2 Changelog `<Badge type="tip" text="v1 → v2" />`
+# V1 → V2 Changelog <Badge type="tip" text="v1 -> v2" />
 
 ## Added
 
