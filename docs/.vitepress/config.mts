@@ -9,7 +9,14 @@ export default defineConfig({
   description: 'Documentation for Super Resolution Mod developers and shaderpack authors.',
   cleanUrls: true,
   lastUpdated: true,
-  head: [['link', { rel: 'icon', href: '/super_resolution_logo.svg' }]],
+  head: [['link', { rel: 'icon', href: '/super_resolution_logo_without_bg.svg' }]],
+  vue: {
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag.startsWith('md-'),
+      },
+    },
+  },
   rewrites: {
     'en/:path*': ':path*',
   },
@@ -34,7 +41,7 @@ export default defineConfig({
     },
   },
   themeConfig: {
-    logo: '/super_resolution_logo.svg',
+    logo: '/super_resolution_logo_without_bg.svg',
     nav: enNav,
     sidebar: enSidebar,
     search: {

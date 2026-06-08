@@ -1,8 +1,414 @@
+@font-face {
+  font-family: 'HarmonyOS Sans SC';
+  src: url('/docs/HarmonyOS_Sans_SC_Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/docs/JetBrainsMono-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
+  --sr-font-brand: 'HarmonyOS Sans SC', Inter, ui-sans-serif, system-ui, sans-serif;
+  --sr-font-plain: Inter, 'HarmonyOS Sans SC', ui-sans-serif, system-ui, sans-serif;
+  --sr-font-mono: 'JetBrains Mono', 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --sr-nav-blur: 18px;
+  --sr-nav-bg-color: rgba(251, 252, 250, 0.84);
+  --sr-page-switch-duration: 0.42s;
+  --sr-code-inline-bg: color-mix(in srgb, #dce8e5 72%, transparent);
+  --sr-code-inline-text: #223a3a;
+  --md-ref-typeface-brand: var(--sr-font-brand);
+  --md-ref-typeface-plain: var(--sr-font-plain);
+  --md-sys-color-primary: #006a6c;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #9cf1f2;
+  --md-sys-color-on-primary-container: #002020;
+  --md-sys-color-secondary: #4a6363;
+  --md-sys-color-on-secondary: #ffffff;
+  --md-sys-color-secondary-container: #cce8e7;
+  --md-sys-color-on-secondary-container: #051f20;
+  --md-sys-color-tertiary: #515e7d;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #d9e2ff;
+  --md-sys-color-on-tertiary-container: #0b1b36;
+  --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
+  --md-sys-color-background: #fefffd;
+  --md-sys-color-on-background: #191c1c;
+  --md-sys-color-surface: #fefffd;
+  --md-sys-color-on-surface: #191c1c;
+  --md-sys-color-surface-variant: #dae5e4;
+  --md-sys-color-on-surface-variant: #3f4949;
+  --md-sys-color-surface-container-lowest: #ffffff;
+  --md-sys-color-surface-container-low: #f1f4f2;
+  --md-sys-color-surface-container: #edf0ee;
+  --md-sys-color-surface-container-high: #e7e9e7;
+  --md-sys-color-surface-container-highest: #e1e3e1;
+  --md-sys-color-outline: #6f7979;
+  --md-sys-color-outline-variant: #bec9c8;
+  --md-sys-color-inverse-surface: #2e3131;
+  --md-sys-color-inverse-on-surface: #eff1ef;
+  --md-sys-color-inverse-primary: #80d5d6;
+  --vp-font-family-base: var(--sr-font-plain);
+  --vp-font-family-mono: var(--sr-font-mono);
+  --vp-c-bg: var(--md-sys-color-background);
+  --vp-c-bg-alt: var(--md-sys-color-surface-container-low);
+  --vp-c-bg-elv: var(--md-sys-color-surface-container-lowest);
+  --vp-c-bg-soft: var(--md-sys-color-surface-container);
+  --vp-c-text-1: var(--md-sys-color-on-surface);
+  --vp-c-text-2: var(--md-sys-color-on-surface-variant);
+  --vp-c-text-3: color-mix(in srgb, var(--md-sys-color-on-surface-variant) 78%, transparent);
+  --vp-c-divider: var(--md-sys-color-outline-variant);
+  --vp-c-border: var(--md-sys-color-outline-variant);
+  --vp-c-gutter: var(--md-sys-color-outline-variant);
+  --vp-c-brand-1: var(--md-sys-color-primary);
+  --vp-c-brand-2: color-mix(in srgb, var(--md-sys-color-primary) 82%, var(--md-sys-color-on-surface));
+  --vp-c-brand-3: color-mix(in srgb, var(--md-sys-color-primary) 68%, var(--md-sys-color-on-surface));
+  --vp-c-brand-soft: var(--md-sys-color-primary-container);
+  --vp-c-default-soft: var(--md-sys-color-surface-container);
+  --vp-button-brand-bg: var(--md-sys-color-primary);
+  --vp-button-brand-hover-bg: color-mix(in srgb, var(--md-sys-color-primary) 88%, var(--md-sys-color-on-surface));
+  --vp-button-brand-active-bg: color-mix(in srgb, var(--md-sys-color-primary) 80%, var(--md-sys-color-on-surface));
+  --vp-button-brand-text: var(--md-sys-color-on-primary);
+  --vp-button-alt-bg: var(--md-sys-color-secondary-container);
+  --vp-button-alt-hover-bg: color-mix(in srgb, var(--md-sys-color-secondary-container) 86%, var(--md-sys-color-on-surface));
+  --vp-button-alt-active-bg: color-mix(in srgb, var(--md-sys-color-secondary-container) 78%, var(--md-sys-color-on-surface));
+  --vp-button-alt-text: var(--md-sys-color-on-secondary-container);
+  --vp-home-hero-name-color: var(--md-sys-color-primary);
+  --vp-home-hero-name-background: none;
+  --vp-home-hero-image-background-image: none;
+  --vp-home-hero-image-filter: none;
+}
+
+.dark {
+  color-scheme: dark;
+  --sr-nav-bg-color: rgba(16, 20, 20, 0.86);
+  --sr-code-inline-bg: color-mix(in srgb, #435756 58%, transparent);
+  --sr-code-inline-text: #d8e7e5;
+  --md-sys-color-primary: #80d5d6;
+  --md-sys-color-on-primary: #003738;
+  --md-sys-color-primary-container: #004f50;
+  --md-sys-color-on-primary-container: #9cf1f2;
+  --md-sys-color-secondary: #b0cccb;
+  --md-sys-color-on-secondary: #1c3535;
+  --md-sys-color-secondary-container: #334b4b;
+  --md-sys-color-on-secondary-container: #cce8e7;
+  --md-sys-color-tertiary: #bac6ea;
+  --md-sys-color-on-tertiary: #23304d;
+  --md-sys-color-tertiary-container: #394664;
+  --md-sys-color-on-tertiary-container: #d9e2ff;
+  --md-sys-color-error: #ffb4ab;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000a;
+  --md-sys-color-on-error-container: #ffdad6;
+  --md-sys-color-background: #101414;
+  --md-sys-color-on-background: #e0e3e1;
+  --md-sys-color-surface: #101414;
+  --md-sys-color-on-surface: #e0e3e1;
+  --md-sys-color-surface-variant: #3f4949;
+  --md-sys-color-on-surface-variant: #bec9c8;
+  --md-sys-color-surface-container-lowest: #0b0f0f;
+  --md-sys-color-surface-container-low: #191c1c;
+  --md-sys-color-surface-container: #1d2020;
+  --md-sys-color-surface-container-high: #272b2a;
+  --md-sys-color-surface-container-highest: #323535;
+  --md-sys-color-outline: #899392;
+  --md-sys-color-outline-variant: #3f4949;
+  --md-sys-color-inverse-surface: #e0e3e1;
+  --md-sys-color-inverse-on-surface: #2e3131;
+  --md-sys-color-inverse-primary: #006a6c;
+}
+
+body {
+  background:
+    linear-gradient(
+      180deg,
+      var(--md-sys-color-surface-container-lowest) 0,
+      var(--md-sys-color-background) 280px
+    );
+}
+
+.sr-site-shader-background {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.dark .sr-site-shader-background {
+  opacity: 0.42;
+}
+
+.VPContent {
+  position: relative;
+  z-index: 1;
+}
+
+* {
+  scrollbar-color: var(--md-sys-color-primary) transparent;
+  scrollbar-width: thin;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-color: var(--md-sys-color-primary);
+  background-clip: content-box;
+}
+
+.VPNavBar .title,
+.VPNavBarMenuLink,
+.VPNavBarMenuGroup .button,
+.VPSidebar .nav .item h2.text,
+.VPHomeHero .name,
+.VPHomeHero .text,
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3 {
+  font-family: var(--sr-font-brand);
+}
+
+.VPNavBar .title {
+  color: var(--md-sys-color-on-surface);
+}
+
+.VPNavBarMenuLink,
+.VPNavBarMenuGroup .button {
+  padding: 0 2px;
+  border-radius: 0;
+  background-color: transparent !important;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.VPNavBarMenuLink.sr-md-ripple-host,
+.VPNavBarMenuGroup .button.sr-md-ripple-host {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  --md-ripple-hover-color: var(--md-sys-color-primary);
+  --md-ripple-pressed-color: var(--md-sys-color-primary);
+  --md-ripple-hover-opacity: 0.055;
+  --md-ripple-pressed-opacity: 0.1;
+}
+
+.VPNavBarMenuLink:hover,
+.VPNavBarMenuLink.active,
+.VPNavBarMenuGroup .button:hover,
+.VPNavBarMenuGroup .button[aria-expanded='true'] {
+  background-color: transparent !important;
+}
+
+.VPNavBarMenuLink > span,
+.VPNavBarMenuGroup .button .text {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background-color: transparent;
+  color: inherit;
+  line-height: 20px;
+  transition:
+    background-color 0.24s ease,
+    color 0.24s ease,
+    opacity 0.24s ease;
+}
+
+.VPNavBarMenuLink:hover > span,
+.VPNavBarMenuGroup .button:hover .text,
+.VPNavBarMenuGroup .button[aria-expanded='true'] .text {
+  background-color: transparent;
+  color: var(--md-sys-color-primary);
+}
+
+.VPNavBarMenuLink.active {
+  color: var(--md-sys-color-primary);
+}
+
+.VPNavBarMenuLink.active > span {
+  background-color: transparent;
+}
+
+.VPFlyout {
+  filter: none !important;
+  clip-path: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  opacity: 1 !important;
+}
+
+.VPFlyout .menu {
+  margin-top: 10px;
+  padding-top: 0;
+  border-radius: 12px;
+  transform: none !important;
+  filter: none !important;
+  opacity: 0 !important;
+  clip-path: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  background-color: transparent !important;
+  transition: visibility 0.2s ease;
+}
+
+.VPFlyout .menu::before {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 12px;
+  background-color: rgba(25, 28, 28, 0.86);
+  content: '';
+  pointer-events: none;
+}
+
+.VPFlyout .menu::after {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 10px;
+  content: '';
+}
+
+:root:not(.dark) .VPFlyout .menu::before {
+  background-color: rgba(241, 244, 242, 0.88);
+}
+
+.VPFlyout:hover .menu,
+.VPFlyout .button[aria-expanded='true'] + .menu {
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+.VPFlyout .menu .VPMenu {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-color: color-mix(in srgb, var(--md-sys-color-outline) 44%, transparent) !important;
+  border-radius: 12px;
+  background-clip: padding-box;
+  box-shadow: none !important;
+  transform: none !important;
+  filter: none !important;
+  clip-path: none !important;
+  -webkit-mask: none !important;
+  mask: none !important;
+  background-color: transparent !important;
+  transition:
+    border-color 0.24s ease,
+    background-color 0.24s ease;
+}
+
+:root:not(.dark) .VPFlyout .menu .VPMenu {
+  background-color: transparent !important;
+}
+
+@supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
+  .VPFlyout .menu {
+    -webkit-backdrop-filter: blur(18px) saturate(1.22);
+    backdrop-filter: blur(18px) saturate(1.22);
+  }
+
+  .VPFlyout .menu::before {
+    background-color: rgba(25, 28, 28, 0.5) !important;
+  }
+
+  :root:not(.dark) .VPFlyout .menu::before {
+    background-color: rgba(241, 244, 242, 0.54) !important;
+  }
+}
+
+.VPFlyout .menu .VPMenu .items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.VPMenuLink > .link {
+  position: relative;
+  overflow: hidden !important;
+  isolation: isolate;
+  border-radius: 8px;
+  color: var(--md-sys-color-on-surface);
+  transition:
+    background-color 0.24s ease,
+    color 0.24s ease,
+    opacity 0.24s ease;
+  --md-ripple-hover-color: var(--md-sys-color-primary);
+  --md-ripple-pressed-color: var(--md-sys-color-primary);
+}
+
+.VPMenuLink > .link:hover,
+.VPMenuLink > .link.active {
+  background-color: color-mix(in srgb, var(--md-sys-color-primary-container) 50%, transparent);
+  color: var(--md-sys-color-primary);
+}
+
+.VPMenuLink > .link > span {
+  position: relative;
+  z-index: 1;
+}
+
+.VPDocFooter .pager-link.sr-md-ripple-host {
+  position: relative;
+  overflow: hidden !important;
+  isolation: isolate;
+  border-radius: 8px;
+  background-color: color-mix(in srgb, var(--md-sys-color-surface-container-low) 72%, transparent);
+  transition:
+    border-color 0.24s ease,
+    background-color 0.24s ease,
+    color 0.24s ease;
+  --md-ripple-hover-color: var(--md-sys-color-primary);
+  --md-ripple-pressed-color: var(--md-sys-color-primary);
+}
+
+.VPDocFooter .pager-link:hover {
+  background-color: color-mix(in srgb, var(--md-sys-color-primary-container) 24%, transparent);
+}
+
+.VPDocFooter .pager-link > span {
+  position: relative;
+  z-index: 1;
+}
+
+.VPDocFooter .pager-link > md-ripple.sr-md-nav-ripple {
+  border-radius: 8px;
+}
+
 .VPSidebar .nav {
   --sr-sidebar-branch-color: color-mix(in srgb, var(--vp-c-divider) 72%, transparent);
   --sr-sidebar-branch-muted-color: color-mix(in srgb, var(--vp-c-divider) 44%, transparent);
-  --sr-sidebar-hover-bg: var(--vp-c-default-soft);
-  --sr-sidebar-active-bg: var(--vp-c-brand-soft);
+  --sr-sidebar-hover-bg: color-mix(in srgb, var(--md-sys-color-primary-container) 30%, transparent);
+  --sr-sidebar-active-bg: color-mix(in srgb, var(--md-sys-color-primary-container) 72%, transparent);
   --sr-sidebar-radius: 7px;
 }
 
@@ -35,29 +441,78 @@
   border-radius: var(--sr-sidebar-radius);
 }
 
-.VPSidebar .nav .VPSidebarItem.level-1.is-link > .item > .link,
-.VPSidebar .nav .VPSidebarItem.level-2.is-link > .item > .link,
-.VPSidebar .nav .VPSidebarItem.level-3.is-link > .item > .link {
+.VPSidebar .nav .VPSidebarItem.is-link > .item > .link {
+  position: relative;
+  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
   min-height: 30px;
+  overflow: hidden !important;
+  isolation: isolate;
   margin-left: -7px;
   padding: 2px 10px 2px 7px;
   border-radius: var(--sr-sidebar-radius);
   transition:
-    background-color 0.25s,
-    box-shadow 0.25s;
+    background-color 0.24s ease,
+    color 0.24s ease,
+    opacity 0.24s ease,
+    box-shadow 0.24s ease;
+  --md-ripple-hover-color: var(--md-sys-color-primary);
+  --md-ripple-pressed-color: var(--md-sys-color-primary);
 }
 
-.VPSidebar .nav .VPSidebarItem.level-1.is-link > .item > .link:hover,
-.VPSidebar .nav .VPSidebarItem.level-2.is-link > .item > .link:hover,
-.VPSidebar .nav .VPSidebarItem.level-3.is-link > .item > .link:hover {
+.VPSidebar .nav .VPSidebarItem.is-link > .item > .link:hover {
   background-color: var(--sr-sidebar-hover-bg);
 }
 
-.VPSidebar .nav .VPSidebarItem.level-1.is-active > .item > .link,
-.VPSidebar .nav .VPSidebarItem.level-2.is-active > .item > .link,
-.VPSidebar .nav .VPSidebarItem.level-3.is-active > .item > .link {
+.VPSidebar .nav .VPSidebarItem.is-active > .item > .link {
   background-color: var(--sr-sidebar-active-bg);
+}
+
+.VPSidebar .nav .VPSidebarItem.is-active > .item > .link:hover {
+  background-color: var(--sr-sidebar-active-bg);
+}
+
+.VPSidebar .nav .VPSidebarItem.is-link > .item > .link > .text,
+.VPSidebar .nav .VPSidebarItem.collapsible > .item > .text {
+  position: relative;
+  z-index: 1;
+}
+
+.VPSidebar .nav .VPSidebarItem.collapsible > .item.sr-md-ripple-host {
+  position: relative;
+  overflow: hidden !important;
+  isolation: isolate;
+  border-radius: var(--sr-sidebar-radius);
+  transition:
+    background-color 0.24s ease,
+    color 0.24s ease,
+    opacity 0.24s ease;
+  --md-ripple-hover-color: var(--md-sys-color-primary);
+  --md-ripple-pressed-color: var(--md-sys-color-primary);
+}
+
+.VPSidebar .nav .VPSidebarItem.collapsible > .item:hover {
+  background-color: var(--sr-sidebar-hover-bg);
+}
+
+md-ripple.sr-md-nav-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.92;
+  transition: opacity 0.24s ease;
+  --md-ripple-hover-opacity: 0.055;
+  --md-ripple-pressed-opacity: 0.1;
+}
+
+.VPNavBarMenuLink > md-ripple.sr-md-nav-ripple,
+.VPNavBarMenuGroup .button > md-ripple.sr-md-nav-ripple {
+  inset: calc((var(--vp-nav-height) - 36px) / 2) 2px;
+  border-radius: 999px;
 }
 
 .VPSidebar .nav .VPSidebarItem.level-1.is-link > .item > .link:focus-visible,
@@ -149,41 +604,58 @@
     transform 0.25s ease-in-out;
 }
 
+.VPDoc .aside-curtain {
+  display: none !important;
+}
+
+.VPDoc .aside,
+.VPDoc .aside-container,
+.VPDoc .aside-content {
+  background: transparent !important;
+}
+
 .VPDoc .aside .aside-container .outline-link:hover {
   transform: translateX(4px);
 }
 
-:root {
-  --sr-nav-blur: 15px;
-  --sr-nav-bg-color: rgba(255, 255, 255, 0.72);
-  --sr-page-switch-duration: 0.42s;
-  --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: -webkit-linear-gradient(120deg, #bd34fe 30%, #41d1ff);
-  --vp-home-hero-image-background-image: linear-gradient(-45deg, #bd34fe 50%, #47caff 50%);
-  --vp-home-hero-image-filter: blur(44px);
-}
-
-.dark {
-  --sr-nav-bg-color: rgba(27, 27, 31, 0.72);
-}
-
-@media (min-width: 640px) {
-  :root {
-    --vp-home-hero-image-filter: blur(56px);
-  }
-}
-
-@media (min-width: 960px) {
-  :root {
-    --vp-home-hero-image-filter: blur(68px);
-  }
-}
-
-.VPNavBar,
 .VPLocalNav,
 .DocSearch-Button {
   -webkit-backdrop-filter: blur(var(--sr-nav-blur));
   backdrop-filter: blur(var(--sr-nav-blur));
+}
+
+.VPNavBar {
+  position: relative;
+  isolation: auto;
+  background-color: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+.VPNavBar::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background-color: var(--sr-nav-bg-color);
+  -webkit-backdrop-filter: blur(var(--sr-nav-blur)) saturate(1.08);
+  backdrop-filter: blur(var(--sr-nav-blur)) saturate(1.08);
+  content: '';
+  pointer-events: none;
+}
+
+.VPNavBar > * {
+  position: relative;
+  z-index: 1;
+}
+
+.VPNavBar .title,
+.VPNavBar .content-body,
+.VPNavBar.has-sidebar .content-body {
+  background-color: transparent !important;
+  transition:
+    color 0.24s ease,
+    background-color 0.24s ease,
+    border-color 0.24s ease;
 }
 
 .VPNavBar:not(.home.top),
@@ -193,9 +665,312 @@
   background-color: var(--sr-nav-bg-color);
 }
 
+.VPNavBar:not(.home.top),
+.VPNavBar.screen-open {
+  background-color: transparent;
+}
+
+.VPSidebar {
+  background-color: transparent !important;
+}
+
+.VPSidebar::before {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--md-sys-color-surface-container-low) 92%, transparent) 5%,
+      transparent 100%
+    );
+  content: '';
+  pointer-events: none;
+}
+
+.VPHomeHero .name,
+.VPHomeHero .text {
+  letter-spacing: 0;
+}
+
+.VPHomeHero .text {
+  color: var(--md-sys-color-on-surface);
+}
+
+.VPHomeHero .tagline {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.VPHomeHero .image-src {
+  filter: drop-shadow(0 18px 38px color-mix(in srgb, var(--md-sys-color-primary) 24%, transparent));
+}
+
+.VPHomeHero .actions > .action,
+.VPHomeFeatures {
+  display: none;
+}
+
+.sr-md-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 6px;
+}
+
+.sr-md-hero-button {
+  min-width: 120px;
+  --md-filled-button-container-height: 40px;
+  --md-filled-button-container-shape: 999px;
+  --md-filled-button-label-text-font: var(--sr-font-brand);
+  --md-filled-tonal-button-container-height: 40px;
+  --md-filled-tonal-button-container-shape: 999px;
+  --md-filled-tonal-button-label-text-font: var(--sr-font-brand);
+}
+
+.sr-md-home-features {
+  padding: 0 24px;
+}
+
+.sr-md-home-features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin: 0 auto;
+  max-width: 1152px;
+}
+
+.sr-md-feature-card {
+  position: relative;
+  display: block;
+  min-height: 176px;
+  overflow: hidden;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 18px;
+  background-color: var(--md-sys-color-surface-container-low);
+  color: var(--md-sys-color-on-surface);
+  text-decoration: none;
+  --md-elevation-level: 1;
+  --md-elevation-shadow-color: var(--md-sys-color-shadow, #000000);
+  --md-ripple-hover-color: var(--md-sys-color-primary);
+  --md-ripple-pressed-color: var(--md-sys-color-primary);
+  transition:
+    border-color 0.22s,
+    background-color 0.22s,
+    transform 0.22s,
+    --md-elevation-level 0.22s;
+}
+
+.sr-md-feature-card:hover {
+  border-color: color-mix(in srgb, var(--md-sys-color-primary) 42%, var(--md-sys-color-outline-variant));
+  background-color: var(--md-sys-color-surface-container);
+  transform: translateY(-2px);
+  --md-elevation-level: 2;
+}
+
+.sr-md-feature-card:focus-visible {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: 3px;
+}
+
+.sr-md-feature-card-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 176px;
+  flex-direction: column;
+  padding: 24px;
+}
+
+.sr-md-feature-card h2 {
+  margin: 0;
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--sr-font-brand);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.sr-md-feature-card p,
+.sr-md-feature-card li {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 14px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.sr-md-feature-card p {
+  flex-grow: 1;
+  margin: 8px 0 0;
+}
+
+.sr-md-feature-card ul {
+  flex-grow: 1;
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.sr-md-feature-card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 16px;
+  color: var(--md-sys-color-primary);
+  font-family: var(--sr-font-brand);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.sr-md-feature-card-link svg {
+  flex: 0 0 auto;
+  transition: transform 0.2s;
+}
+
+.sr-md-feature-card:hover .sr-md-feature-card-link svg {
+  transform: translateX(3px);
+}
+
+.VPButton {
+  min-height: 40px;
+  border-radius: 999px;
+  padding: 0 24px;
+  font-family: var(--sr-font-brand);
+  font-weight: 500;
+  letter-spacing: 0;
+  box-shadow: none;
+  transition:
+    background-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
+}
+
+.VPButton:hover {
+  transform: translateY(-1px);
+}
+
+.VPButton.brand {
+  box-shadow: 0 3px 8px color-mix(in srgb, var(--md-sys-color-primary) 28%, transparent);
+}
+
+.VPButton.alt {
+  border-color: transparent;
+}
+
+.VPFeatures .VPFeature {
+  position: relative;
+  overflow: hidden;
+  border-radius: 8px;
+  border-color: var(--md-sys-color-outline-variant);
+  background-color: var(--md-sys-color-surface-container-low);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--md-sys-color-on-surface) 10%, transparent);
+  transition:
+    border-color 0.22s,
+    background-color 0.22s,
+    box-shadow 0.22s,
+    transform 0.22s;
+}
+
+.VPFeatures .VPFeature:hover {
+  border-color: color-mix(in srgb, var(--md-sys-color-primary) 42%, var(--md-sys-color-outline-variant));
+  background-color: var(--md-sys-color-surface-container);
+  box-shadow: 0 6px 18px color-mix(in srgb, var(--md-sys-color-on-surface) 14%, transparent);
+  transform: translateY(-2px);
+}
+
+.VPFeatures .VPFeature .title {
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--sr-font-brand);
+  letter-spacing: 0;
+}
+
+.VPFeatures .VPFeature .details {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3 {
+  color: var(--md-sys-color-on-surface);
+  letter-spacing: 0;
+}
+
+.vp-doc p,
+.vp-doc li {
+  color: var(--md-sys-color-on-surface);
+}
+
+.vp-doc a {
+  color: var(--md-sys-color-primary);
+  text-decoration-color: color-mix(in srgb, var(--md-sys-color-primary) 42%, transparent);
+  text-underline-offset: 3px;
+}
+
+.vp-doc a:hover {
+  text-decoration-color: currentColor;
+}
+
+.vp-doc blockquote {
+  border-left-color: var(--md-sys-color-tertiary);
+  border-radius: 0 8px 8px 0;
+  background-color: var(--md-sys-color-tertiary-container);
+  color: var(--md-sys-color-on-tertiary-container);
+  padding: 12px 16px;
+}
+
+.vp-doc blockquote p {
+  color: var(--md-sys-color-on-tertiary-container);
+}
+
+.vp-doc table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.vp-doc tr {
+  border-top-color: var(--md-sys-color-outline-variant);
+}
+
+.vp-doc tr:nth-child(2n) {
+  background-color: var(--md-sys-color-surface-container-low);
+}
+
+.vp-doc th,
+.vp-doc td {
+  border-color: var(--md-sys-color-outline-variant);
+}
+
+.vp-doc div[class*='language-'] {
+  border-radius: 8px;
+  background-color: var(--md-sys-color-surface-container-high);
+}
+
+.vp-doc :not(pre) > code {
+  border: 1px solid color-mix(in srgb, var(--md-sys-color-primary) 18%, transparent);
+  border-radius: 5px;
+  padding: 0.1em 0.42em;
+  color: var(--sr-code-inline-text);
+  background-color: var(--sr-code-inline-bg);
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.vp-doc a > code {
+  color: var(--md-sys-color-primary);
+}
+
 @media (min-width: 960px) {
   .VPNavBar:not(.home.top) .content-body {
-    background-color: transparent;
+    background-color: transparent !important;
+  }
+
+  .sr-md-home-features-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -209,6 +984,50 @@
 
 .sr-page-enter .VPContent {
   animation: sr-page-enter var(--sr-page-switch-duration) cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.sr-md-route-progress {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+  --md-linear-progress-active-indicator-color: var(--md-sys-color-primary);
+  --md-linear-progress-track-color: transparent;
+}
+
+.sr-page-leave .sr-md-route-progress {
+  opacity: 1;
+}
+
+.sr-md-scroll-fab {
+  position: fixed;
+  z-index: 30;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(24px, env(safe-area-inset-bottom));
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.96);
+  transition:
+    opacity 0.2s,
+    visibility 0.2s,
+    transform 0.2s;
+  --md-fab-container-color: var(--md-sys-color-primary-container);
+  --md-fab-icon-color: var(--md-sys-color-on-primary-container);
+  --md-fab-lowered-container-elevation: 2;
+  --md-fab-lowered-hover-container-elevation: 3;
+}
+
+.sr-md-scroll-fab.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translateY(0) scale(1);
 }
 
 @keyframes sr-page-enter {
@@ -270,5 +1089,12 @@
     transform: none;
     transition: none;
     filter: none;
+  }
+
+  .VPButton:hover,
+  .VPFeatures .VPFeature:hover,
+  .sr-md-scroll-fab,
+  .sr-md-scroll-fab.is-visible {
+    transform: none;
   }
 }
