@@ -16,7 +16,7 @@
                 </div>
                 <div class="card-content">
                     <h3 class="card-title tech-font">MODRINTH</h3>
-                    <p class="card-desc">下载最新版本模组</p>
+                    <p class="card-desc">{{ messages.modrinthDesc }}</p>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -37,7 +37,7 @@
                 </div>
                 <div class="card-content">
                     <h3 class="card-title tech-font">GITHUB</h3>
-                    <p class="card-desc">探索模组源码与提交 Issue 问题</p>
+                    <p class="card-desc">{{ messages.githubDesc }}</p>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -54,7 +54,7 @@
                 </div>
                 <div class="card-content">
                     <h3 class="card-title tech-font">MCMOD</h3>
-                    <p class="card-desc">访问中文Minecraft模组百科条目</p>
+                    <p class="card-desc">{{ messages.mcmodDesc }}</p>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -74,7 +74,7 @@
                 </div>
                 <div class="card-content">
                     <h3 class="card-title tech-font">DISCORD</h3>
-                    <p class="card-desc">加入我们的社区</p>
+                    <p class="card-desc">{{ messages.discordDesc }}</p>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -95,7 +95,7 @@
                 </div>
                 <div class="card-content">
                     <h3 class="card-title tech-font">WIKI</h3>
-                    <p class="card-desc">查看模组的Wiki</p>
+                    <p class="card-desc">{{ messages.wikiDesc }}</p>
                 </div>
                 <div class="card-arrow">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -111,9 +111,17 @@
 
 <script lang="ts">
 import {defineComponent} from 'vue';
+import type {PropType} from 'vue';
+import type { LinkCardMessage } from '../i18n'
 
 export default defineComponent({
-    name: 'LinkCards'
+    name: 'LinkCards',
+    props: {
+        messages: {
+            type: Object as PropType<LinkCardMessage>,
+            required: true
+        }
+    }
 });
 </script>
 

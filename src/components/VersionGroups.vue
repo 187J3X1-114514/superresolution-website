@@ -1,7 +1,7 @@
 <template>
     <section class="version-section">
         <div class="section-animate">
-            <h2 class="section-title">支持的游戏版本与加载器</h2>
+            <h2 class="section-title">{{ messages.title }}</h2>
 
             <div class="version-grid">
                 <div v-for="(v, index) in versions" :key="index" class="version-card">
@@ -11,7 +11,7 @@
                     </div>
                     <div class="v-card-body">
                         <div class="v-version">{{ v.version }}</div>
-                        <div class="v-latest tech-font">Latest: {{ v.latest_version }}</div>
+                        <div class="v-latest tech-font">{{ messages.latestLabel }}: {{ v.latest_version }}</div>
                     </div>
                 </div>
             </div>
@@ -22,6 +22,7 @@
 <script lang="ts">
 import {defineComponent} from 'vue';
 import type {PropType} from 'vue';
+import type { AppMessages } from '../i18n'
 
 export interface VersionInfo {
     version: string;
@@ -36,17 +37,15 @@ export default defineComponent({
         versions: {
             type: Array as PropType<VersionInfo[]>,
             required: true
+        },
+        messages: {
+            type: Object as PropType<AppMessages['versions']>,
+            required: true
         }
     },
-    setup() {
-        const getStateText = (state: string) => {
-            const map: Record<string, string> = {
-                'lts': 'LTS (长期支持)',
-                'main': 'MAIN (主要维护)',
-                'wip': 'WIP (开发中)',
-                'deprecated': 'DEPRECATED (已弃用)'
-            };
-            return map[state] || state.toUpperCase();
+    setup(props) {
+        const getStateText = (state: VersionInfo['state']) => {
+            return props.messages.states[state] || state.toUpperCase();
         };
 
         return {getStateText};

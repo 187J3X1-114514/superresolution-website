@@ -4,8 +4,8 @@
             <div v-if="visible" class="modal-overlay" @click.self="$emit('close')">
                 <div class="modal-content glass-card">
                     <div class="modal-header">
-                        <h2 class="modal-title tech-font">Nightly 构建</h2>
-                        <button class="modal-close" @click="$emit('close')">
+                        <h2 class="modal-title tech-font">{{ messages.title }}</h2>
+                        <button class="modal-close" :aria-label="messages.closeLabel" :title="messages.closeLabel" @click="$emit('close')">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                                 <line x1="18" y1="6" x2="6" y2="18"></line>
                                 <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -15,25 +15,25 @@
 
                     <div class="modal-filters">
                         <div class="filter-group">
-                            <label class="filter-label">MC 版本</label>
+                            <label class="filter-label">{{ messages.mcVersionLabel }}</label>
                             <select v-model="selectedMcVersion" class="filter-select" @change="onFilterChange">
-                                <option value="">全部</option>
+                                <option value="">{{ messages.allOption }}</option>
                                 <option v-for="v in dropdownMcVersions" :key="v" :value="v">{{ v }}</option>
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label class="filter-label">加载器</label>
+                            <label class="filter-label">{{ messages.loaderLabel }}</label>
                             <select v-model="selectedLoader" class="filter-select" @change="onFilterChange">
-                                <option value="">全部</option>
+                                <option value="">{{ messages.allOption }}</option>
                                 <option v-for="l in dropdownLoaders" :key="l" :value="l">{{ l }}</option>
                             </select>
                         </div>
                     </div>
 
                     <div class="modal-body">
-                        <div v-if="loading" class="modal-status">加载中...</div>
+                        <div v-if="loading" class="modal-status">{{ messages.loading }}</div>
                         <div v-else-if="error" class="modal-status modal-error">{{ error }}</div>
-                        <div v-else-if="filteredVersions.length === 0" class="modal-status">没有符合条件的版本</div>
+                        <div v-else-if="filteredVersions.length === 0" class="modal-status">{{ messages.empty }}</div>
                         <template v-else>
                             <div class="version-list">
                                 <div v-for="item in filteredVersions" :key="item.id" class="version-row">
@@ -49,6 +49,8 @@
                                         <button
                                             class="download-btn"
                                             :disabled="downloadingId === item.id"
+                                            :aria-label="messages.downloadLabel"
+                                            :title="messages.downloadLabel"
                                             @click="onDownload(item)"
                                         >
                                             <template v-if="downloadingId === item.id">
@@ -67,9 +69,9 @@
                             </div>
 
                             <div class="modal-pagination">
-                                <button class="page-btn" :disabled="page <= 1" @click="goPage(page - 1)">上一页</button>
-                                <span class="page-info">第 {{ page }} 页</span>
-                                <button class="page-btn" :disabled="filteredVersions.length < pageSize" @click="goPage(page + 1)">下一页</button>
+                                <button class="page-btn" :disabled="page <= 1" @click="goPage(page - 1)">{{ messages.previous }}</button>
+                                <span class="page-info">{{ messages.pageInfo(page) }}</span>
+                                <button class="page-btn" :disabled="filteredVersions.length < pageSize" @click="goPage(page + 1)">{{ messages.next }}</button>
                             </div>
                         </template>
                     </div>
@@ -81,9 +83,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
 import { fetchVersions, getDownloadUrl } from '../utils/api'
 import { buildFilename } from '../utils/filename'
 import type { VersionEntry } from '../utils/api'
+import type { NightlyMessages } from '../i18n'
 
 const PAGE_SIZE = 50
 
@@ -91,6 +95,10 @@ export default defineComponent({
     name: 'NightlyModal',
     props: {
         visible: { type: Boolean, default: false },
+        messages: {
+            type: Object as PropType<NightlyMessages>,
+            required: true,
+        },
     },
     emits: ['close'],
     data() {
@@ -153,7 +161,7 @@ export default defineComponent({
                 this.page = p
                 this.collectDropdownOptions(data)
             } catch (e: any) {
-                this.error = e.message || '加载失败'
+                this.error = e.message || this.messages.loadFailed
             } finally {
                 this.loading = false
             }
@@ -191,7 +199,7 @@ export default defineComponent({
                 document.body.removeChild(a)
                 URL.revokeObjectURL(blobUrl)
             } catch (e: any) {
-                alert(e.message || '下载失败')
+                alert(e.message || this.messages.downloadFailed)
             } finally {
                 this.downloadingId = null
             }

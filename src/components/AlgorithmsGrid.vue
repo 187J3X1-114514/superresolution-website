@@ -1,6 +1,6 @@
 <template>
     <section id="algorithms">
-        <h2 class="section-title section-animate">内置算法</h2>
+        <h2 class="section-title section-animate">{{ title }}</h2>
         <div class="algo-grid-extended">
             <slot/>
         </div>
@@ -12,6 +12,9 @@ import {defineComponent} from 'vue';
 
 export default defineComponent({
     name: 'AlgorithmsGrid',
+    props: {
+        title: {type: String, required: true}
+    },
     setup() {
         return {};
     }

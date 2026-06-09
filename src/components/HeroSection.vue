@@ -2,19 +2,17 @@
     <header id="hero">
         <div class="hero-layout">
             <div class="hero-left">
-                <div class="hero-badge">Minecraft Rendering Optimization Mod</div>
+                <div class="hero-badge">{{ messages.badge }}</div>
                 <h1 class="hero-title">Super <br><span>Resolution</span></h1>
-                <p class="hero-desc">在 Minecraft 中内置多种超分辨率算法，包括 FSR、DLSS、XeSS
-                    等。通过降低实际渲染分辨率，再由算法将画面重建回原分辨率，以可接受的画质损失换取帧率提升；也可将超分比例设低于
-                    1.0，相当于高质量抗锯齿，提升画面清晰度。</p>
+                <p class="hero-desc">{{ messages.desc }}</p>
 
                 <div class="btn-group">
                     <!-- 改成这样：文字包在 <span> 里 -->
                     <a href="https://modrinth.com/mod/superresolution" target="_blank" class="btn btn-primary">
-                        <span>Modrinth 主页</span>
+                        <span>{{ messages.modrinth }}</span>
                     </a>
                     <a href="https://github.com/187J3X1-114514/superresolution" target="_blank" class="btn btn-primary">
-                        <span>GitHub 存储库</span>
+                        <span>{{ messages.github }}</span>
                     </a>
                 </div>
             </div>
@@ -40,6 +38,21 @@
         </div>
     </header>
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+import type { AppMessages } from '../i18n'
+
+export default defineComponent({
+    name: 'HeroSection',
+    props: {
+        messages: {
+            type: Object as () => AppMessages['hero'],
+            required: true,
+        },
+    },
+})
+</script>
 
 <style scoped>
 header {

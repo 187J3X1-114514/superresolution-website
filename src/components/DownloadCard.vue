@@ -1,6 +1,6 @@
 <template>
     <section class="download-section section-animate">
-        <h2 class="section-title">下载</h2>
+        <h2 class="section-title">{{ messages.title }}</h2>
         <div class="download-panels">
             <a href="https://modrinth.com/mod/superresolution" target="_blank" class="download-panel">
                 <div class="panel-icon modrinth-icon">
@@ -15,7 +15,7 @@
                 </div>
                 <div class="panel-content">
                     <h3 class="panel-title tech-font">MODRINTH</h3>
-                    <p class="panel-desc">下载最新版本模组</p>
+                    <p class="panel-desc">{{ messages.modrinthDesc }}</p>
                 </div>
                 <div class="panel-arrow">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -34,7 +34,7 @@
                 </div>
                 <div class="panel-content">
                     <h3 class="panel-title tech-font">NIGHTLY</h3>
-                    <p class="panel-desc">浏览历史构建版本</p>
+                    <p class="panel-desc">{{ messages.nightlyDesc }}</p>
                 </div>
                 <div class="panel-arrow">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -49,9 +49,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import type { AppMessages } from '../i18n'
 
 export default defineComponent({
     name: 'DownloadCard',
+    props: {
+        messages: {
+            type: Object as () => AppMessages['download'],
+            required: true,
+        },
+    },
     emits: ['open-nightly'],
 })
 </script>
