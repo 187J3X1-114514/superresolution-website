@@ -29,7 +29,7 @@ export default defineComponent({
     background: linear-gradient(135deg, rgba(16, 32, 22, 0.7) 0%, rgba(5, 12, 8, 0.9) 100%);
     border: 1px solid var(--clr-border);
     border-top: 2px solid rgba(0, 255, 157, 0.3); /* 初始淡入边框 */
-    padding: 40px 32px; /* 增加内边距 */
+    padding: clamp(24px, 6vw, 40px) clamp(20px, 5vw, 32px); /* 增加内边距 */
     position: relative;
     transition: all 0.5s ease-in; /* 使用带有轻微回弹的 Ease */
     backdrop-filter: blur(10px);
@@ -62,8 +62,9 @@ export default defineComponent({
 
 .algo-card-title {
     color: #fff;
-    font-size: 1.4rem;
+    font-size: clamp(1.15rem, 4vw, 1.4rem);
     font-weight: 700;
+    line-height: 1.25;
 }
 
 .algo-subtitle {
@@ -75,6 +76,12 @@ export default defineComponent({
     color: var(--clr-text-muted);
     font-size: 0.95rem;
     line-height: 1.7;
+}
+
+@media (max-width: 420px) {
+    .algo-card {
+        padding: 22px 18px;
+    }
 }
 </style>
 

@@ -60,7 +60,7 @@ export default defineComponent({
 
 .version-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
     gap: 20px;
     margin-top: 24px;
 }
@@ -88,6 +88,7 @@ export default defineComponent({
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
 }
 
 .v-loader {
@@ -103,6 +104,7 @@ export default defineComponent({
     border-radius: 4px;
     font-weight: 600;
     letter-spacing: 0.5px;
+    white-space: nowrap;
 }
 
 .state-lts {
@@ -136,14 +138,34 @@ export default defineComponent({
 }
 
 .v-version {
-    font-size: 1.8rem;
+    font-size: clamp(1.35rem, 6vw, 1.8rem);
     font-weight: 800;
     color: var(--clr-text);
+    line-height: 1.2;
 }
 
 .v-latest {
     font-size: 0.85rem;
     color: var(--clr-text-muted);
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+    .version-grid {
+        gap: 14px;
+    }
+
+    .version-card {
+        padding: 18px;
+        gap: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .v-card-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
 }
 </style>
 

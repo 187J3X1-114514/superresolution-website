@@ -59,7 +59,7 @@ header {
     min-height: 100vh;
     display: flex;
     align-items: center;
-    padding-top: 60px;
+    padding: 84px 0 56px;
 }
 
 .hero-layout {
@@ -103,7 +103,7 @@ header {
 }
 
 .hero-title {
-    font-size: clamp(3rem, 8vw, 4.5rem);
+    font-size: clamp(2.9rem, 7vw, 4.5rem);
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: 20px;
@@ -132,8 +132,9 @@ header {
 /* Logo 视觉区域 */
 .logo-viewport {
     position: relative;
-    width: 380px;
-    height: 380px;
+    width: min(380px, 34vw);
+    aspect-ratio: 1;
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -203,6 +204,7 @@ header {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    min-height: 48px;
 
     background: transparent !important;
     overflow: visible;
@@ -314,10 +316,15 @@ header {
 
 /* 响应式调整 */
 @media (max-width: 900px) {
+    header {
+        min-height: auto;
+        padding: 82px 0 58px;
+    }
+
     .hero-layout {
         flex-direction: column-reverse;
         text-align: center;
-        padding-top: 40px;
+        gap: 22px;
     }
 
     .hero-left {
@@ -327,9 +334,51 @@ header {
     }
 
     .logo-viewport {
-        width: 280px;
-        height: 280px;
-        margin-bottom: 20px;
+        width: min(280px, 72vw);
+        margin-bottom: 4px;
+    }
+}
+
+@media (max-width: 520px) {
+    header {
+        padding: 76px 0 44px;
+    }
+
+    .hero-badge {
+        max-width: 100%;
+        padding: 6px 12px;
+        font-size: 0.72rem;
+        letter-spacing: 1px;
+        margin-bottom: 18px;
+    }
+
+    .hero-title {
+        font-size: clamp(2.45rem, 14vw, 3.35rem);
+        letter-spacing: 0;
+        margin-bottom: 16px;
+    }
+
+    .hero-desc {
+        font-size: 1rem;
+        margin-bottom: 28px;
+    }
+
+    .btn-group {
+        width: 100%;
+        gap: 12px;
+    }
+
+    .btn {
+        flex: 1 1 160px;
+        padding: 12px 16px;
+        font-size: 0.86rem;
+        letter-spacing: 0.5px;
+    }
+}
+
+@media (max-width: 360px) {
+    .btn {
+        flex-basis: 100%;
     }
 }
 </style>

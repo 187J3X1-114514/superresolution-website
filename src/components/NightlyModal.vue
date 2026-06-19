@@ -235,14 +235,14 @@ export default defineComponent({
     justify-content: center;
     background: rgba(0, 0, 0, 0.7);
     backdrop-filter: blur(4px);
+    padding: 18px;
 }
 
 .modal-content {
-    width: min(82%, 92vw);
+    width: min(1120px, 100%);
     max-height: 85vh;
     display: flex;
     flex-direction: column;
-    margin: 0 24px;
     overflow: hidden;
 }
 
@@ -254,9 +254,10 @@ export default defineComponent({
 }
 
 .modal-title {
-    font-size: 1.5rem;
+    font-size: clamp(1.12rem, 5vw, 1.5rem);
     color: var(--clr-primary);
     letter-spacing: 1px;
+    line-height: 1.25;
 }
 
 .modal-close {
@@ -293,6 +294,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     gap: 6px;
+    min-width: 0;
 }
 
 .filter-label {
@@ -333,6 +335,7 @@ export default defineComponent({
     flex: 1;
     overflow-y: auto;
     min-height: 200px;
+    overscroll-behavior: contain;
 }
 
 .modal-status {
@@ -372,6 +375,7 @@ export default defineComponent({
     gap: 10px;
     flex-wrap: wrap;
     min-width: 0;
+    flex: 1;
 }
 
 .version-tag {
@@ -529,17 +533,94 @@ export default defineComponent({
 }
 
 @media (max-width: 640px) {
+    .modal-overlay {
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .modal-content {
+        max-height: calc(100dvh - 24px);
+        width: 100%;
+    }
+
+    .modal-header {
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .modal-close {
+        width: 40px;
+        height: 40px;
+        flex-shrink: 0;
+    }
+
+    .modal-filters {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .filter-select {
+        width: 100%;
+        min-width: 0;
+        height: 42px;
+    }
+
     .version-row {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+        padding: 12px;
     }
     .version-info {
         gap: 6px;
+        width: 100%;
     }
     .version-right {
         width: 100%;
         justify-content: space-between;
+        gap: 10px;
+    }
+
+    .version-tag {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .version-mc {
+        white-space: normal;
+        overflow-wrap: anywhere;
+    }
+
+    .modal-pagination {
+        gap: 10px;
+        justify-content: space-between;
+    }
+
+    .page-btn {
+        min-height: 40px;
+        padding: 8px 14px;
+    }
+}
+
+@media (max-width: 360px) {
+    .modal-overlay {
+        padding: 8px;
+    }
+
+    .modal-content {
+        max-height: calc(100dvh - 16px);
+    }
+
+    .modal-pagination {
+        flex-wrap: wrap;
+    }
+
+    .page-info {
+        order: -1;
+        width: 100%;
+        text-align: center;
     }
 }
 </style>

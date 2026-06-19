@@ -200,12 +200,19 @@ export default defineComponent({
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: var(--clr-bg);
   color: var(--clr-text);
   font-family: 'Roboto', sans-serif;
   line-height: 1.6;
-
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 h1, h2, h3, .tech-font { font-family: 'Space Grotesk', sans-serif; }
@@ -213,9 +220,9 @@ h1, h2, h3, .tech-font { font-family: 'Space Grotesk', sans-serif; }
 /* Background & cursor styles moved to BackgroundEffects.vue */
 
 .container {
-  max-width: 65%;
+  width: min(1180px, 100%);
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 clamp(20px, 5vw, 40px);
   position: relative;
 }
 
@@ -237,11 +244,12 @@ section {
 }
 
 .section-title {
-  font-size: 2rem;
+  font-size: clamp(1.45rem, 4vw, 2rem);
   margin-bottom: 40px;
   display: flex;
   align-items: center;
   gap: 16px;
+  line-height: 1.2;
 }
 .section-title::before {
   content: '';
@@ -256,7 +264,7 @@ section {
   border: 1px solid var(--clr-border);
   border-left: 3px solid var(--clr-primary);
   backdrop-filter: blur(16px);
-  padding: 32px;
+  padding: clamp(22px, 5vw, 32px);
   transition: transform 0.3s ease, background 0.3s ease;
 }
 
@@ -285,4 +293,52 @@ section {
 .issue-card .section-title::before { background: var(--clr-danger); }
 
 footer { padding: 60px 0; text-align: center; color: var(--clr-text-muted); font-size: 0.9rem; border-top: 1px solid var(--clr-border); margin-top: 60px; }
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 18px;
+  }
+
+  header {
+    min-height: auto;
+  }
+
+  section {
+    margin-bottom: 64px;
+  }
+
+  .section-title {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .section-title::before {
+    width: 28px;
+  }
+
+  .glass-card {
+    border-left-width: 2px;
+  }
+
+  footer {
+    padding: 36px 0;
+    margin-top: 36px;
+  }
+}
+
+@media (max-width: 420px) {
+  .container {
+    padding: 0 14px;
+  }
+
+  .section-title {
+    align-items: flex-start;
+  }
+
+  .section-title::before {
+    margin-top: 0.7em;
+    width: 22px;
+    flex-shrink: 0;
+  }
+}
 </style>

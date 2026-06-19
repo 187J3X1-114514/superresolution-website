@@ -154,5 +154,41 @@ export default defineComponent({
         rgba(5, 10, 7, 0.38) 100%
     );
 }
+
+@media (hover: none), (pointer: coarse) {
+    .cursor-glow,
+    .cursor-dot {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .cursor-glow,
+    .cursor-dot {
+        display: none;
+    }
+
+    .geometric-shape {
+        opacity: 0.18;
+        animation-duration: calc(var(--shape-duration) * 1.4);
+    }
+
+    #bg-container {
+        background-position: center top;
+    }
+
+    #bg-overlay {
+        background: radial-gradient(
+            circle at 50% 0%,
+            rgba(0, 255, 157, 0.08) 0%,
+            rgba(5, 10, 7, 0.96) 62%
+        ),
+        linear-gradient(
+            180deg,
+            rgba(5, 10, 7, 0.32) 0%,
+            rgba(5, 10, 7, 0.62) 100%
+        );
+    }
+}
 </style>
 

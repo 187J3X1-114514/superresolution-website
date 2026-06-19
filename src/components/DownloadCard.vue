@@ -80,7 +80,7 @@ export default defineComponent({
     align-items: center;
     background: rgba(16, 32, 22, 0.4);
     border: 1px solid rgba(0, 255, 157, 0.2);
-    padding: 24px;
+    padding: clamp(18px, 4vw, 24px);
     text-decoration: none;
     position: relative;
     overflow: hidden;
@@ -147,6 +147,7 @@ a.download-panel {
 
 .panel-content {
     flex-grow: 1;
+    min-width: 0;
 }
 
 .panel-title {
@@ -154,6 +155,7 @@ a.download-panel {
     font-size: 1.1rem;
     margin-bottom: 6px;
     letter-spacing: 1px;
+    line-height: 1.2;
 }
 
 .panel-desc {
@@ -170,6 +172,7 @@ a.download-panel {
     transition: all 0.4s ease;
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
 }
 
 .download-panel:hover .panel-arrow {
@@ -180,6 +183,37 @@ a.download-panel {
 @media (max-width: 640px) {
     .download-panels {
         grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .download-panel {
+        align-items: flex-start;
+    }
+
+    .panel-icon {
+        width: 42px;
+        height: 42px;
+        margin-right: 14px;
+    }
+
+    .panel-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .panel-arrow {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (max-width: 360px) {
+    .download-panel {
+        padding: 16px;
+    }
+
+    .panel-icon {
+        margin-right: 10px;
     }
 }
 </style>

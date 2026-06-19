@@ -25,8 +25,14 @@ export default defineComponent({
 /* grid layout for algorithm cards moved here from App.vue */
 .algo-grid-extended {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
     gap: 24px;
+}
+
+@media (max-width: 640px) {
+    .algo-grid-extended {
+        gap: 16px;
+    }
 }
 </style>
 

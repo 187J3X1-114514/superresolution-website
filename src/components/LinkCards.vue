@@ -133,7 +133,7 @@ export default defineComponent({
 
 .link-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
     gap: 20px;
 }
 
@@ -142,7 +142,7 @@ export default defineComponent({
     align-items: center;
     background: rgba(16, 32, 22, 0.4);
     border: 1px solid rgba(0, 255, 157, 0.2);
-    padding: 24px;
+    padding: clamp(18px, 4vw, 24px);
     text-decoration: none;
     position: relative;
     overflow: hidden;
@@ -233,6 +233,7 @@ export default defineComponent({
 
 .card-content {
     flex-grow: 1;
+    min-width: 0;
 }
 
 .card-title {
@@ -240,6 +241,7 @@ export default defineComponent({
     font-size: 1.1rem;
     margin-bottom: 6px;
     letter-spacing: 1px;
+    line-height: 1.2;
 }
 
 .card-desc {
@@ -256,10 +258,52 @@ export default defineComponent({
     transition: all 0.4s ease;
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
 }
 
 .link-card:hover .card-arrow {
     opacity: 1;
     transform: translateX(0);
+}
+
+@media (max-width: 640px) {
+    .link-cards-section {
+        margin-top: 36px;
+        margin-bottom: 48px;
+    }
+
+    .link-cards-grid {
+        gap: 14px;
+    }
+
+    .link-card {
+        align-items: flex-start;
+    }
+
+    .card-icon {
+        width: 42px;
+        height: 42px;
+        margin-right: 14px;
+    }
+
+    .card-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .card-arrow {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+@media (max-width: 360px) {
+    .link-card {
+        padding: 16px;
+    }
+
+    .card-icon {
+        margin-right: 10px;
+    }
 }
 </style>
