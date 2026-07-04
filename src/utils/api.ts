@@ -1,4 +1,4 @@
-const API_BASE = 'https://api.187j3x1-114514.org'
+const API_BASE = 'https://api.187j3x1-114514.org/sr'
 
 //read only
 const TOKEN = 'ce2c2e26855dea4d673719f42e5d8be3d59c040b20501b5a003f6f6277302af2'

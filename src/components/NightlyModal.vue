@@ -167,16 +167,21 @@ export default defineComponent({
             }
         },
         collectDropdownOptions(list: VersionEntry[]) {
-            for (const v of list) {
-                for (const mc of v.mc_versions) {
-                    if (!this.dropdownMcVersions.includes(mc)) {
-                        this.dropdownMcVersions.push(mc)
-                    }
-                }
-                if (!this.dropdownLoaders.includes(v.loader)) {
-                    this.dropdownLoaders.push(v.loader)
-                }
-            }
+          this.dropdownMcVersions = []
+          this.dropdownLoaders = []
+          this.dropdownMcVersions.push(
+              "1.20.1",
+              "1.21",
+              "1.21.1",
+              "1.21.11",
+              "26.1",
+              "26.2"
+          )
+          this.dropdownLoaders.push(
+              "fabric",
+              "forge",
+              "neoforge",
+          )
         },
         onFilterChange() {
             this.fetchPage(1)
