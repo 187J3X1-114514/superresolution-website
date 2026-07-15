@@ -6,8 +6,7 @@ export interface AlgorithmMessage {
 }
 
 export interface LinkCardMessage {
-    modrinthDesc: string
-    curseforgeDesc: string
+    title: string
     githubDesc: string
     mcmodDesc: string
     discordDesc: string
@@ -153,8 +152,7 @@ export const translations: Record<Locale, AppMessages> = {
             nightlyDesc: '浏览历史构建版本',
         },
         links: {
-            modrinthDesc: '下载最新版本模组',
-            curseforgeDesc: '访问 CurseForge 模组主页',
+            title: '社区与资源',
             githubDesc: '探索模组源码与提交 Issue 问题',
             mcmodDesc: '访问中文 Minecraft 模组百科条目',
             discordDesc: '加入我们的社区',
@@ -253,8 +251,7 @@ export const translations: Record<Locale, AppMessages> = {
             nightlyDesc: 'Browse historical builds',
         },
         links: {
-            modrinthDesc: 'Download the latest mod release',
-            curseforgeDesc: 'Open the CurseForge mod page',
+            title: 'Community & Resources',
             githubDesc: 'Explore the source code and submit issues',
             mcmodDesc: 'Open the Chinese Minecraft mod encyclopedia entry',
             discordDesc: 'Join our community',

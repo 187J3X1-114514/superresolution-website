@@ -29,9 +29,11 @@ export default defineComponent({
 }
 
 .algo-grid-extended :deep(.algo-card:last-child:nth-child(odd)) {
-    width: calc(50% - 12px);
     grid-column: 1 / -1;
-    justify-self: center;
+}
+
+.algo-grid-extended :deep(.algo-card:last-child:nth-child(odd) .algo-desc) {
+    max-width: 84ch;
 }
 
 @media (max-width: 640px) {

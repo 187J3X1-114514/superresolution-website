@@ -42,13 +42,17 @@ export default defineComponent({
 .issue-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    gap: 0;
 }
 
 .issue-type {
-    padding: 18px 20px;
-    background: rgba(255, 74, 74, 0.035);
-    border: 1px solid rgba(255, 74, 74, 0.14);
+    padding: 4px clamp(18px, 3vw, 32px) 4px 0;
+}
+
+.issue-type + .issue-type {
+    border-left: 1px solid rgba(255, 74, 74, 0.18);
+    padding-right: 0;
+    padding-left: clamp(18px, 3vw, 32px);
 }
 
 .issue-type h3 {
@@ -73,11 +77,18 @@ export default defineComponent({
 @media (max-width: 640px) {
     .issue-grid {
         grid-template-columns: 1fr;
-        gap: 12px;
     }
 
     .issue-type {
-        padding: 16px;
+        padding: 0;
+    }
+
+    .issue-type + .issue-type {
+        border-left: 0;
+        border-top: 1px solid rgba(255, 74, 74, 0.16);
+        margin-top: 18px;
+        padding-top: 18px;
+        padding-left: 0;
     }
 }
 </style>

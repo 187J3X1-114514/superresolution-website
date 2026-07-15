@@ -3,22 +3,14 @@ import './style.css'
 import App from './App.vue'
 import tilt from './directives/tilt'
 
-createApp(App)
+const app = createApp(App)
     .directive('tilt', tilt)
-    .mount('#app')
-const fontA = new FontFace('HarmonyOS', 'url(/HarmonyOS_Sans_SC_Medium.woff2)')
-const fontB = new FontFace('JetBrainsMono', 'url(/JetBrainsMono-Medium.ttf)')
 
-document.fonts.add(fontA)
-document.fonts.add(fontB)
+app.mount('#app')
 
-await fontA.load()
-await fontB.load()
-
-document.fonts.ready.then(() => {
-    document.getElementById('app')!.style.display = 'block'
-    document.getElementById('loading')!.classList.add('loadingdone')
-    document.getElementById('app')!.classList.add('done')
+requestAnimationFrame(() => {
+    document.getElementById('loading')?.classList.add('loadingdone')
+    document.getElementById('app')?.classList.add('done')
 })
 
 

@@ -1,51 +1,7 @@
 <template>
     <section class="link-cards-section section-animate">
+        <h2 class="section-title">{{ messages.title }}</h2>
         <div class="link-cards-grid">
-            <a v-tilt href="https://modrinth.com/mod/superresolution" target="_blank" rel="noopener noreferrer" class="link-card">
-                <div class="card-icon modrinth-icon">
-                    <!-- Modrinth Icon SVG -->
-                    <svg xmlns="http://www.w3.org/2000/svg" width="512" height="514" viewBox="0 0 512 514"
-                         class="modrinth-icon text-brand" data-v-f97a579e="">
-                        <path fill="currentColor" fill-rule="evenodd"
-                              d="M503.16 323.56c11.39-42.09 12.16-87.65.04-132.8C466.57 54.23 326.04-26.8 189.33 9.78 83.81 38.02 11.39 128.07.69 230.47h43.3c10.3-83.14 69.75-155.74 155.76-178.76 106.3-28.45 215.38 28.96 253.42 129.67l-42.14 11.27c-19.39-46.85-58.46-81.2-104.73-95.83l-7.74 43.84c36.53 13.47 66.16 43.84 77 84.25 15.8 58.89-13.62 119.23-67 144.26l11.53 42.99c70.16-28.95 112.31-101.86 102.34-177.02l41.98-11.23a210.2 210.2 0 0 1-3.86 84.16z"
-                              clip-rule="evenodd"></path>
-                        <path fill="currentColor"
-                              d="M321.99 504.22C185.27 540.8 44.75 459.77 8.11 323.24A257.6 257.6 0 0 1 0 275.46h43.27c1.09 11.91 3.2 23.89 6.41 35.83 3.36 12.51 7.77 24.46 13.11 35.78l38.59-23.15c-3.25-7.5-5.99-15.32-8.17-23.45-24.04-89.6 29.2-181.7 118.92-205.71 17-4.55 34.1-6.32 50.8-5.61L255.19 133c-10.46.05-21.08 1.42-31.66 4.25-66.22 17.73-105.52 85.7-87.78 151.84 1.1 4.07 2.38 8.04 3.84 11.9l49.35-29.61-14.87-39.43 46.6-47.87 58.9-12.69 17.05 20.99-27.15 27.5-23.68 7.45-16.92 17.39 8.29 23.07s16.79 17.84 16.82 17.85l23.72-6.31 16.88-18.54 36.86-11.67 10.98 24.7-38.03 46.63-63.73 20.18-28.58-31.82-49.82 29.89c25.54 29.08 63.94 45.23 103.75 41.86l11.53 42.99c-59.41 7.86-117.44-16.73-153.49-61.91l-38.41 23.04c50.61 66.49 138.2 99.43 223.97 76.48 61.74-16.52 109.79-58.6 135.81-111.78l42.64 15.5c-30.89 66.28-89.84 118.94-166.07 139.34">
-                        </path>
-                    </svg>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title tech-font">MODRINTH</h3>
-                    <p class="card-desc">{{ messages.modrinthDesc }}</p>
-                </div>
-                <div class="card-arrow">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </div>
-            </a>
-
-            <a v-tilt href="https://www.curseforge.com/minecraft/mc-mods/super-resolution" target="_blank" rel="noopener noreferrer" class="link-card">
-                <div class="card-icon curseforge-icon">
-                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                        <path d="M18.6 3.2c-1.1 1.3-2.4 2.1-3.9 2.5.2-1.3-.2-2.6-1.2-3.7-1.3 2.4-3.1 4.2-5.3 5.4C5.5 8.9 4 11.2 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-2.1-.7-4-2-5.5.6-1.6.8-3.4.6-5.3ZM12 18.5c-2.5 0-4.5-2-4.5-4.5 0-1.6.8-3 2.1-3.8-.1 1.5.4 2.8 1.5 3.8.2-1.8 1.1-3.4 2.5-4.6 1.8 1.1 2.9 2.7 2.9 4.6 0 2.5-2 4.5-4.5 4.5Z"/>
-                    </svg>
-                </div>
-                <div class="card-content">
-                    <h3 class="card-title tech-font">CURSEFORGE</h3>
-                    <p class="card-desc">{{ messages.curseforgeDesc }}</p>
-                </div>
-                <div class="card-arrow">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                        <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                </div>
-            </a>
-
             <a v-tilt href="https://github.com/187J3X1-114514/superresolution" target="_blank" rel="noopener noreferrer" class="link-card">
                 <div class="card-icon github-icon">
                     <!-- GitHub Icon SVG -->
@@ -152,7 +108,7 @@ export default defineComponent({
 
 .link-cards-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px;
 }
 
@@ -219,16 +175,6 @@ export default defineComponent({
     width: 100%;
     height: 100%;
     object-fit: cover;
-}
-
-.modrinth-icon {
-    background: transparent;
-    color: #1BD96A;
-}
-
-.curseforge-icon {
-    background: transparent;
-    color: #f16436;
 }
 
 .github-icon {
@@ -300,12 +246,6 @@ export default defineComponent({
 .link-card:hover .mcmod-icon,
 .link-card:focus-visible .mcmod-icon {
     transform: translateZ(14px) scale(0.79);
-}
-
-@media (max-width: 900px) {
-    .link-cards-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
 }
 
 @media (max-width: 640px) {

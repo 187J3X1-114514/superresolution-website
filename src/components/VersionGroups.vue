@@ -95,8 +95,8 @@ export default defineComponent({
 <style scoped>
 .version-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
 }
 
 .version-card {
@@ -120,7 +120,7 @@ export default defineComponent({
 .version-header {
     display: flex;
     align-items: center;
-    padding: 20px 22px 16px;
+    padding: 16px 18px 13px;
     border-bottom: 1px solid rgba(0, 255, 157, 0.12);
 }
 
@@ -141,7 +141,7 @@ export default defineComponent({
     grid-template-columns: 1fr;
     align-items: center;
     gap: 6px;
-    padding: 14px 22px;
+    padding: 11px 18px 12px;
 }
 
 .loader-row + .loader-row {
@@ -203,10 +203,16 @@ export default defineComponent({
     text-align: left;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 1080px) {
+    .version-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 680px) {
     .version-grid {
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 12px;
     }
 }
 

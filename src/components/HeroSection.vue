@@ -2,8 +2,13 @@
     <header id="hero">
         <div class="hero-layout">
             <div class="hero-left">
-                <div class="hero-badge">{{ messages.badge }}</div>
-                <h1 class="hero-title">Super <br><span>Resolution</span></h1>
+                <div class="hero-badge">
+                    <DecryptedText :key="messages.badge" :text="messages.badge" />
+                </div>
+                <h1 class="hero-title">
+                    <span class="hero-title-word hero-title-primary">Super</span>
+                    <span class="hero-title-word hero-title-accent">Resolution</span>
+                </h1>
                 <p class="hero-desc">{{ messages.desc }}</p>
 
                 <div class="btn-group">
@@ -44,9 +49,11 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import type { AppMessages } from '../i18n'
+import DecryptedText from './DecryptedText.vue'
 
 export default defineComponent({
     name: 'HeroSection',
+    components: { DecryptedText },
     props: {
         messages: {
             type: Object as () => AppMessages['hero'],
@@ -58,10 +65,10 @@ export default defineComponent({
 
 <style scoped>
 header {
-    min-height: clamp(640px, 92svh, 860px);
+    min-height: clamp(590px, 82svh, 760px);
     display: flex;
     align-items: center;
-    padding: 72px 0 52px;
+    padding: 68px 0 48px;
 }
 
 .hero-layout {
@@ -110,20 +117,33 @@ header {
     margin-bottom: 20px;
     text-transform: uppercase;
     letter-spacing: 0;
-    opacity: 0;
-    transform: translateY(50px);
-    clip-path: inset(100% 0 0 0);
-    animation: heroTitleReveal 0.9s var(--ease-out) 0.22s forwards;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
 }
 
-.hero-title span {
+.hero-title-word {
+    display: block;
+    opacity: 0;
+    filter: blur(12px);
+    transform: translateY(22px);
+    animation: heroTitleBlurIn 0.72s var(--ease-out) forwards;
+}
+
+.hero-title-primary {
+    color: var(--clr-text);
+    animation-delay: 0.2s;
+}
+
+.hero-title-accent {
     color: var(--clr-primary);
+    animation-delay: 0.32s;
 }
 
 .hero-desc {
     font-size: 1.15rem;
     color: var(--clr-text-muted);
-    max-width: 550px;
+    max-width: 58ch;
     margin-bottom: 32px;
     opacity: 0;
     transform: translateY(20px);
@@ -266,7 +286,6 @@ header {
 
 .btn span {
     color: var(--clr-primary);
-    mix-blend-mode: difference;
     z-index: 3;
     position: relative;
 }
@@ -276,7 +295,12 @@ header {
 }
 
 .btn span {
-    transition: filter 0.45s cubic-bezier(0.86, 0, 0.07, 1);
+    transition: color 0.45s cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+.btn:hover span,
+.btn:focus-visible span {
+    color: #041008;
 }
 
 @keyframes heroFadeDown {
@@ -293,11 +317,11 @@ header {
     }
 }
 
-@keyframes heroTitleReveal {
+@keyframes heroTitleBlurIn {
     to {
         opacity: 1;
         transform: translateY(0);
-        clip-path: inset(0 0 0 0);
+        filter: blur(0);
     }
 }
 
@@ -305,6 +329,17 @@ header {
     to {
         opacity: 1;
         transform: translateX(0) scale(1);
+    }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+    .btn-group {
+        gap: 12px;
+    }
+
+    .btn {
+        padding-inline: 18px;
+        font-size: 0.86rem;
     }
 }
 
@@ -326,15 +361,19 @@ header {
         align-items: center;
     }
 
+    .hero-title {
+        align-items: center;
+    }
+
     .logo-viewport {
-        width: min(230px, 60vw);
+        width: min(205px, 52vw);
         margin-bottom: 0;
     }
 }
 
 @media (max-width: 520px) {
     header {
-        padding: 68px 0 38px;
+        padding: 62px 0 34px;
     }
 
     .hero-badge {
@@ -354,6 +393,7 @@ header {
     .hero-desc {
         font-size: 1rem;
         margin-bottom: 24px;
+        max-width: 36ch;
     }
 
     .btn-group {
@@ -371,13 +411,13 @@ header {
 
 @media (prefers-reduced-motion: reduce) {
     .hero-badge,
-    .hero-title,
+    .hero-title-word,
     .hero-desc,
     .hero-right,
     .btn {
         opacity: 1;
         transform: none;
-        clip-path: none;
+        filter: none;
         animation: none;
     }
 
@@ -388,7 +428,9 @@ header {
 
 @media (max-width: 360px) {
     .btn {
-        flex-basis: 100%;
+        flex-basis: 145px;
+        padding-inline: 8px;
+        font-size: 0.78rem;
     }
 }
 </style>

@@ -191,13 +191,13 @@ export default defineComponent({
 
         <VersionGroups :versions="versionList" :messages="messages.versions" />
 
-        <IssueCard :messages="messages.issue" />
-
         <DownloadCard :messages="messages.download" @open-nightly="showNightly = true" />
 
         <NightlyModal :visible="showNightly" :messages="messages.nightly" @close="showNightly = false" />
 
         <LinkCards :messages="messages.links" />
+
+        <IssueCard :messages="messages.issue" />
       </main>
 
       <footer>
@@ -282,12 +282,19 @@ section {
 .overview-copy {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(20px, 4vw, 42px);
+  gap: 0;
   color: var(--clr-text-muted);
 }
 
 .overview-copy p {
   line-height: 1.78;
+  max-width: 58ch;
+}
+
+.overview-copy p + p {
+  border-left: 1px solid rgba(0, 255, 157, 0.16);
+  margin-left: clamp(20px, 3vw, 36px);
+  padding-left: clamp(20px, 3vw, 36px);
 }
 
 .issue-card .section-title::before { background: var(--clr-danger); }
@@ -370,11 +377,13 @@ select {
 .motion-ready .reveal-item {
   --reveal-offset: 18px;
   opacity: 0;
+  filter: blur(6px);
 }
 
 .motion-ready .reveal-item.is-visible {
   --reveal-offset: 0px;
   opacity: 1;
+  filter: blur(0);
   transition-delay: var(--reveal-delay, 0ms);
 }
 
@@ -386,7 +395,8 @@ select {
   transform: translate3d(0, var(--reveal-offset), 0);
   transition:
     transform 0.65s var(--ease-out) var(--reveal-delay, 0ms),
-    opacity 0.55s ease var(--reveal-delay, 0ms);
+    opacity 0.55s ease var(--reveal-delay, 0ms),
+    filter 0.55s ease var(--reveal-delay, 0ms);
 }
 
 @media (max-width: 768px) {
@@ -414,6 +424,14 @@ select {
   .overview-copy {
     grid-template-columns: 1fr;
     gap: 18px;
+  }
+
+  .overview-copy p + p {
+    border-left: 0;
+    border-top: 1px solid rgba(0, 255, 157, 0.14);
+    margin-left: 0;
+    padding-left: 0;
+    padding-top: 18px;
   }
 
   footer {
@@ -455,6 +473,7 @@ select {
   .motion-ready .reveal-item {
     opacity: 1;
     transform: none;
+    filter: none;
   }
 }
 
