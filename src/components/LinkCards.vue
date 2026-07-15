@@ -27,6 +27,25 @@
                 </div>
             </a>
 
+            <a href="https://www.curseforge.com/minecraft/mc-mods/super-resolution" target="_blank" class="link-card">
+                <div class="card-icon curseforge-icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M18.6 3.2c-1.1 1.3-2.4 2.1-3.9 2.5.2-1.3-.2-2.6-1.2-3.7-1.3 2.4-3.1 4.2-5.3 5.4C5.5 8.9 4 11.2 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-2.1-.7-4-2-5.5.6-1.6.8-3.4.6-5.3ZM12 18.5c-2.5 0-4.5-2-4.5-4.5 0-1.6.8-3 2.1-3.8-.1 1.5.4 2.8 1.5 3.8.2-1.8 1.1-3.4 2.5-4.6 1.8 1.1 2.9 2.7 2.9 4.6 0 2.5-2 4.5-4.5 4.5Z"/>
+                    </svg>
+                </div>
+                <div class="card-content">
+                    <h3 class="card-title tech-font">CURSEFORGE</h3>
+                    <p class="card-desc">{{ messages.curseforgeDesc }}</p>
+                </div>
+                <div class="card-arrow">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                         stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
+                </div>
+            </a>
+
             <a href="https://github.com/187J3X1-114514/superresolution" target="_blank" class="link-card">
                 <div class="card-icon github-icon">
                     <!-- GitHub Icon SVG -->
@@ -204,6 +223,11 @@ export default defineComponent({
 .modrinth-icon {
     background: transparent;
     color: #1BD96A;
+}
+
+.curseforge-icon {
+    background: transparent;
+    color: #f16436;
 }
 
 .github-icon {

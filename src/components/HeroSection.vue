@@ -11,6 +11,9 @@
                     <a href="https://modrinth.com/mod/superresolution" target="_blank" class="btn btn-primary">
                         <span>{{ messages.modrinth }}</span>
                     </a>
+                    <a href="https://www.curseforge.com/minecraft/mc-mods/super-resolution" target="_blank" class="btn btn-primary">
+                        <span>{{ messages.curseforge }}</span>
+                    </a>
                     <a href="https://github.com/187J3X1-114514/superresolution" target="_blank" class="btn btn-primary">
                         <span>{{ messages.github }}</span>
                     </a>
@@ -219,8 +222,12 @@ header {
     animation-delay: 0.95s;
 }
 
-.btn-group .btn:last-child {
+.btn-group .btn:nth-child(2) {
     animation-delay: 1.1s;
+}
+
+.btn-group .btn:nth-child(3) {
+    animation-delay: 1.25s;
 }
 
 /* 2. 边框层 */

@@ -7,6 +7,7 @@ export interface AlgorithmMessage {
 
 export interface LinkCardMessage {
     modrinthDesc: string
+    curseforgeDesc: string
     githubDesc: string
     mcmodDesc: string
     discordDesc: string
@@ -38,6 +39,7 @@ export interface AppMessages {
         badge: string
         desc: string
         modrinth: string
+        curseforge: string
         github: string
     }
     overview: {
@@ -64,6 +66,7 @@ export interface AppMessages {
     download: {
         title: string
         modrinthDesc: string
+        curseforgeDesc: string
         nightlyDesc: string
     }
     links: LinkCardMessage
@@ -82,6 +85,7 @@ export const translations: Record<Locale, AppMessages> = {
             badge: 'Minecraft Rendering Optimization Mod',
             desc: '在 Minecraft 中内置多种超分辨率算法，包括 FSR、DLSS、XeSS 等。通过降低实际渲染分辨率，再由算法将画面重建回原分辨率，以可接受的画质损失换取帧率提升；也可将超分比例设低于 1.0，相当于高质量抗锯齿，提升画面清晰度。',
             modrinth: 'Modrinth 主页',
+            curseforge: 'CurseForge 主页',
             github: 'GitHub 存储库',
         },
         overview: {
@@ -145,10 +149,12 @@ export const translations: Record<Locale, AppMessages> = {
         download: {
             title: '下载',
             modrinthDesc: '下载最新版本模组',
+            curseforgeDesc: '通过 CurseForge 下载模组',
             nightlyDesc: '浏览历史构建版本',
         },
         links: {
             modrinthDesc: '下载最新版本模组',
+            curseforgeDesc: '访问 CurseForge 模组主页',
             githubDesc: '探索模组源码与提交 Issue 问题',
             mcmodDesc: '访问中文 Minecraft 模组百科条目',
             discordDesc: '加入我们的社区',
@@ -179,6 +185,7 @@ export const translations: Record<Locale, AppMessages> = {
             badge: 'Minecraft Rendering Optimization Mod',
             desc: 'Adds multiple super resolution algorithms to Minecraft, including FSR, DLSS, and XeSS. The mod lowers the internal render resolution, then reconstructs the image back to the display resolution for higher frame rates with acceptable quality loss. Ratios below 1.0 can also act as high-quality anti-aliasing for a sharper image.',
             modrinth: 'Modrinth Page',
+            curseforge: 'CurseForge Page',
             github: 'GitHub Repository',
         },
         overview: {
@@ -242,10 +249,12 @@ export const translations: Record<Locale, AppMessages> = {
         download: {
             title: 'Download',
             modrinthDesc: 'Download the latest mod release',
+            curseforgeDesc: 'Download the mod from CurseForge',
             nightlyDesc: 'Browse historical builds',
         },
         links: {
             modrinthDesc: 'Download the latest mod release',
+            curseforgeDesc: 'Open the CurseForge mod page',
             githubDesc: 'Explore the source code and submit issues',
             mcmodDesc: 'Open the Chinese Minecraft mod encyclopedia entry',
             discordDesc: 'Join our community',

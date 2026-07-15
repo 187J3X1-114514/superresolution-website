@@ -41,29 +41,41 @@ export default defineComponent({
       showNightly: false,
       // 游戏版本支持列表
       versionList: [
-                {
+        {
+          "version": "26.2",
+          "loader": "fabric",
+          "state": "main",
+          "latest_version": "0.8.3-alpha.5"
+        },
+        {
+          "version": "26.2",
+          "loader": "neoforge",
+          "state": "main",
+          "latest_version": "0.8.3-alpha.5"
+        },
+        {
           "version": "26.1 - 26.1.2",
           "loader": "fabric",
           "state": "main",
-          "latest_version": "0.8.3-alpha.4"
+          "latest_version": "0.8.3-alpha.5"
         },
         {
           "version": "26.1 - 26.1.2",
           "loader": "neoforge",
           "state": "main",
-          "latest_version": "0.8.3-alpha.4"
+          "latest_version": "0.8.3-alpha.5"
         },
         {
           "version": "1.21.11",
           "loader": "fabric",
           "state": "main",
-          "latest_version": "0.8.3-alpha.4"
+          "latest_version": "0.8.3-alpha.5"
         },
         {
           "version": "1.21.11",
           "loader": "neoforge",
           "state": "main",
-          "latest_version": "0.8.3-alpha.4"
+          "latest_version": "0.8.3-alpha.5"
         },
         {
           "version": "1.21.4 - 1.21.8",
@@ -81,13 +93,13 @@ export default defineComponent({
           "version": "1.21 - 1.21.1",
           "loader": "fabric",
           "state": "main",
-          "latest_version": "0.8.3-alpha.4"
+          "latest_version": "0.8.3-alpha.5"
         },
         {
           "version": "1.21 - 1.21.1",
           "loader": "neoforge",
           "state": "main",
-          "latest_version": "0.8.3-alpha.4"
+          "latest_version": "0.8.3-alpha.5"
         },
         {
           "version": "1.20.6",
@@ -111,7 +123,7 @@ export default defineComponent({
           "version": "1.20.1",
           "loader": "forge",
           "state": "main",
-          "latest_version": "0.8.3-alpha.4"
+          "latest_version": "0.8.3-alpha.5"
         }
       ] as VersionInfo[]
     }
