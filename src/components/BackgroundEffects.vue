@@ -1,18 +1,20 @@
 <template>
-    <div style="position: fixed;top: 0;left: 0;right: 0;bottom: 0;width: 100%;height: 100%">
-        <div id="bg-container" style="position: fixed;width: 100%;height: 100%"></div>
-        <div id="bg-overlay" style="position: fixed;width: 100%;height: 100%"></div>
-        <div id="geometry-wrapper" style="position: fixed;width: 100%;height: 100%">
+    <div class="background-effects">
+        <div id="bg-container"></div>
+        <ShaderBackdrop />
+        <div id="bg-overlay"></div>
+        <div id="geometry-wrapper">
             <div v-for="(shape, index) in shapes" :key="index" class="geometric-shape" :style="shape"></div>
         </div>
 
-        <div id="cursor-glow" class="cursor-glow"></div>
-        <div id="cursor-dot" class="cursor-dot"></div>
+        <div ref="cursorGlow" class="cursor-glow"></div>
+        <div ref="cursorDot" class="cursor-dot"></div>
     </div>
 </template>
 
 <script lang="ts">
 import {defineComponent, onBeforeUnmount, onMounted, ref} from 'vue';
+import ShaderBackdrop from './ShaderBackdrop.vue'
 
 type ShapeStyle = Record<string, string>;
 
@@ -22,8 +24,11 @@ function randomBetween(min: number, max: number) {
 
 export default defineComponent({
     name: 'BackgroundEffects',
+    components: { ShaderBackdrop },
     setup() {
         const shapes = ref<ShapeStyle[]>([]);
+        const cursorGlow = ref<HTMLElement | null>(null)
+        const cursorDot = ref<HTMLElement | null>(null)
         let removeMouseListener = () => {};
 
         onMounted(() => {
@@ -49,39 +54,57 @@ export default defineComponent({
                 };
             });
 
-            const cursorGlow = document.getElementById('cursor-glow');
-            const cursorDot = document.getElementById('cursor-dot');
+            let frame = 0
+            let x = -100
+            let y = -100
+
+            const updateCursor = () => {
+                frame = 0
+                cursorDot.value?.style.setProperty('transform', `translate3d(${x - 3}px, ${y - 3}px, 0)`)
+                cursorGlow.value?.style.setProperty('transform', `translate3d(${x - 160}px, ${y - 160}px, 0)`)
+            }
+
             const onMouseMove = (event: MouseEvent) => {
-                cursorDot?.style.setProperty('transform', `translate(${event.clientX}px, ${event.clientY}px)`);
-                cursorGlow?.style.setProperty(
-                    'transform',
-                    `translate(${event.clientX - 200}px, ${event.clientY - 200}px) scale(4)`
-                );
+                x = event.clientX
+                y = event.clientY
+
+                if (!frame) {
+                    frame = requestAnimationFrame(updateCursor)
+                }
             };
 
-            window.addEventListener('mousemove', onMouseMove);
-            removeMouseListener = () => window.removeEventListener('mousemove', onMouseMove);
+            window.addEventListener('mousemove', onMouseMove, { passive: true });
+            removeMouseListener = () => {
+                cancelAnimationFrame(frame)
+                window.removeEventListener('mousemove', onMouseMove)
+            };
         });
 
         onBeforeUnmount(() => {
             removeMouseListener();
         });
 
-        return {shapes};
+        return { shapes, cursorGlow, cursorDot };
     }
 });
 </script>
 
 <style scoped>
-.scanline {
-    width: 100%;
-    height: 100px;
-    z-index: 999;
+.background-effects {
     position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
-    background: linear-gradient(0deg, rgba(0, 255, 157, 0) 0%, rgba(0, 255, 157, 0.1) 50%, rgba(0, 255, 157, 0) 100%);
-    opacity: 0.1;
-    top: 0;
+}
+
+#geometry-wrapper {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
 }
 
 .geometric-shape {
@@ -108,16 +131,15 @@ export default defineComponent({
 
 .cursor-glow {
     position: fixed;
-    width: 400px;
-    height: 400px;
+    width: 320px;
+    height: 320px;
     border-radius: 50%;
     pointer-events: none;
     z-index: 9999;
     mix-blend-mode: screen;
-    background: radial-gradient(circle, rgba(0, 255, 157, 0.15) 0%, transparent 10%);
-    transform-origin: 50% 50%;
-    transform: scale(4);
-    transition: transform 0.45s ease-out;
+    background: radial-gradient(circle, rgba(0, 255, 157, 0.09) 0%, rgba(0, 255, 157, 0.025) 28%, transparent 68%);
+    transform: translate3d(-400px, -400px, 0);
+    will-change: transform;
 }
 
 .cursor-dot {
@@ -129,13 +151,14 @@ export default defineComponent({
     pointer-events: none;
     z-index: 10000;
     box-shadow: 0 0 10px #00ff9d;
-    transition: transform 0.1s linear;
+    transform: translate3d(-20px, -20px, 0);
+    will-change: transform;
 }
 
 #bg-container {
     position: fixed;
     inset: 0;
-    z-index: -1;
+    z-index: -3;
     background-size: cover;
     background-position: center;
     filter: grayscale(50%) contrast(100%);
@@ -188,6 +211,17 @@ export default defineComponent({
             rgba(5, 10, 7, 0.32) 0%,
             rgba(5, 10, 7, 0.62) 100%
         );
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .geometric-shape {
+        animation: none;
+    }
+
+    .cursor-glow,
+    .cursor-dot {
+        display: none;
     }
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="algo-card">
+    <article v-tilt class="algo-card">
         <div class="algo-card-header">
             <div>
                 <h3 class="algo-card-title tech-font">{{ title }}</h3>
@@ -9,7 +9,7 @@
         <p class="algo-desc">
             <slot/>
         </p>
-    </div>
+    </article>
 </template>
 
 <script lang="ts">
@@ -28,19 +28,20 @@ export default defineComponent({
 .algo-card {
     background: linear-gradient(135deg, rgba(16, 32, 22, 0.7) 0%, rgba(5, 12, 8, 0.9) 100%);
     border: 1px solid var(--clr-border);
-    border-top: 2px solid rgba(0, 255, 157, 0.3); /* 初始淡入边框 */
-    padding: clamp(24px, 6vw, 40px) clamp(20px, 5vw, 32px); /* 增加内边距 */
+    border-top: 2px solid rgba(0, 255, 157, 0.3);
+    padding: clamp(24px, 4vw, 34px) clamp(20px, 4vw, 30px);
     position: relative;
-    transition: all 0.5s ease-in; /* 使用带有轻微回弹的 Ease */
+    min-height: 100%;
     backdrop-filter: blur(10px);
+    overflow: hidden;
 }
 
 .algo-card:hover {
-    border-top: 2px solid var(--clr-primary);
-    /* 这里的 transform 会被 PinnedAlgorithms 里的 hover 样式覆盖或叠加 */
+    border-top-color: var(--clr-primary);
+    border-color: rgba(0, 255, 157, 0.38);
+    box-shadow: 0 18px 42px rgba(0, 255, 157, 0.09);
 }
 
-/* 装饰性元素：增加一个角落的小光标 */
 .algo-card::after {
     content: '';
     position: absolute;

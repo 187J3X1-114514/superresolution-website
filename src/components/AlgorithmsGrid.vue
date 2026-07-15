@@ -22,16 +22,27 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* grid layout for algorithm cards moved here from App.vue */
 .algo-grid-extended {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
+}
+
+.algo-grid-extended :deep(.algo-card:last-child:nth-child(odd)) {
+    width: calc(50% - 12px);
+    grid-column: 1 / -1;
+    justify-self: center;
 }
 
 @media (max-width: 640px) {
     .algo-grid-extended {
+        grid-template-columns: 1fr;
         gap: 16px;
+    }
+
+    .algo-grid-extended :deep(.algo-card:last-child:nth-child(odd)) {
+        width: 100%;
+        grid-column: auto;
     }
 }
 </style>

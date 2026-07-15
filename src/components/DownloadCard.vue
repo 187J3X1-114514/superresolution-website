@@ -2,7 +2,7 @@
     <section class="download-section section-animate">
         <h2 class="section-title">{{ messages.title }}</h2>
         <div class="download-panels">
-            <a href="https://modrinth.com/mod/superresolution" target="_blank" class="download-panel">
+            <a v-tilt href="https://modrinth.com/mod/superresolution" target="_blank" rel="noopener noreferrer" class="download-panel">
                 <div class="panel-icon modrinth-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="512" height="514" viewBox="0 0 512 514" class="modrinth-svg">
                         <path fill="currentColor" fill-rule="evenodd"
@@ -25,7 +25,7 @@
                 </div>
             </a>
 
-            <a href="https://www.curseforge.com/minecraft/mc-mods/super-resolution" target="_blank" class="download-panel">
+            <a v-tilt href="https://www.curseforge.com/minecraft/mc-mods/super-resolution" target="_blank" rel="noopener noreferrer" class="download-panel">
                 <div class="panel-icon curseforge-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M18.6 3.2c-1.1 1.3-2.4 2.1-3.9 2.5.2-1.3-.2-2.6-1.2-3.7-1.3 2.4-3.1 4.2-5.3 5.4C5.5 8.9 4 11.2 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-2.1-.7-4-2-5.5.6-1.6.8-3.4.6-5.3ZM12 18.5c-2.5 0-4.5-2-4.5-4.5 0-1.6.8-3 2.1-3.8-.1 1.5.4 2.8 1.5 3.8.2-1.8 1.1-3.4 2.5-4.6 1.8 1.1 2.9 2.7 2.9 4.6 0 2.5-2 4.5-4.5 4.5Z"/>
@@ -43,7 +43,7 @@
                 </div>
             </a>
 
-            <div class="download-panel nightly-panel" @click="$emit('open-nightly')">
+            <button v-tilt type="button" class="download-panel nightly-panel" @click="$emit('open-nightly')">
                 <div class="panel-icon nightly-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="10"></circle>
@@ -60,7 +60,7 @@
                         <polyline points="12 5 19 12 12 19"></polyline>
                     </svg>
                 </div>
-            </div>
+            </button>
         </div>
     </section>
 </template>
@@ -102,13 +102,12 @@ export default defineComponent({
     text-decoration: none;
     position: relative;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     backdrop-filter: blur(8px);
-    cursor: default;
-}
-
-a.download-panel {
     cursor: pointer;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    width: 100%;
 }
 
 .download-panel::before {
@@ -120,22 +119,20 @@ a.download-panel {
     height: 100%;
     background: var(--clr-primary);
     opacity: 0.5;
-    transition: all 0.4s ease;
+    transition: width 0.4s ease, opacity 0.4s ease;
 }
 
-.download-panel:hover {
+.download-panel:hover,
+.download-panel:focus-visible {
     background: rgba(16, 32, 22, 0.8);
     border-color: var(--clr-primary);
     box-shadow: 0 10px 30px rgba(0, 255, 157, 0.1);
 }
 
-.download-panel:hover::before {
+.download-panel:hover::before,
+.download-panel:focus-visible::before {
     width: 100%;
     opacity: 0.05;
-}
-
-.nightly-panel {
-    cursor: pointer;
 }
 
 .panel-icon {
@@ -147,7 +144,7 @@ a.download-panel {
     border-radius: 12px;
     margin-right: 20px;
     flex-shrink: 0;
-    transition: all 0.4s ease;
+    transition: color 0.4s ease, transform 0.4s var(--ease-out);
 }
 
 .panel-icon svg {
@@ -191,15 +188,21 @@ a.download-panel {
     color: var(--clr-primary);
     opacity: 0;
     transform: translateX(-10px);
-    transition: all 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.4s var(--ease-out);
     width: 24px;
     height: 24px;
     flex-shrink: 0;
 }
 
-.download-panel:hover .panel-arrow {
+.download-panel:hover .panel-arrow,
+.download-panel:focus-visible .panel-arrow {
     opacity: 1;
     transform: translateX(0);
+}
+
+.download-panel:hover .panel-icon,
+.download-panel:focus-visible .panel-icon {
+    transform: translateZ(16px) scale(1.04);
 }
 
 @media (max-width: 900px) {

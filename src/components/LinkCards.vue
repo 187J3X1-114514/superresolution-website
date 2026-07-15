@@ -1,7 +1,7 @@
 <template>
     <section class="link-cards-section section-animate">
         <div class="link-cards-grid">
-            <a href="https://modrinth.com/mod/superresolution" target="_blank" class="link-card">
+            <a v-tilt href="https://modrinth.com/mod/superresolution" target="_blank" rel="noopener noreferrer" class="link-card">
                 <div class="card-icon modrinth-icon">
                     <!-- Modrinth Icon SVG -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="512" height="514" viewBox="0 0 512 514"
@@ -27,7 +27,7 @@
                 </div>
             </a>
 
-            <a href="https://www.curseforge.com/minecraft/mc-mods/super-resolution" target="_blank" class="link-card">
+            <a v-tilt href="https://www.curseforge.com/minecraft/mc-mods/super-resolution" target="_blank" rel="noopener noreferrer" class="link-card">
                 <div class="card-icon curseforge-icon">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M18.6 3.2c-1.1 1.3-2.4 2.1-3.9 2.5.2-1.3-.2-2.6-1.2-3.7-1.3 2.4-3.1 4.2-5.3 5.4C5.5 8.9 4 11.2 4 14c0 4.4 3.6 8 8 8s8-3.6 8-8c0-2.1-.7-4-2-5.5.6-1.6.8-3.4.6-5.3ZM12 18.5c-2.5 0-4.5-2-4.5-4.5 0-1.6.8-3 2.1-3.8-.1 1.5.4 2.8 1.5 3.8.2-1.8 1.1-3.4 2.5-4.6 1.8 1.1 2.9 2.7 2.9 4.6 0 2.5-2 4.5-4.5 4.5Z"/>
@@ -46,7 +46,7 @@
                 </div>
             </a>
 
-            <a href="https://github.com/187J3X1-114514/superresolution" target="_blank" class="link-card">
+            <a v-tilt href="https://github.com/187J3X1-114514/superresolution" target="_blank" rel="noopener noreferrer" class="link-card">
                 <div class="card-icon github-icon">
                     <!-- GitHub Icon SVG -->
                     <svg viewBox="0 0 24 24" fill="currentColor">
@@ -67,7 +67,7 @@
                 </div>
             </a>
 
-            <a href="https://www.mcmod.cn/class/17888.html" target="_blank" class="link-card">
+            <a v-tilt href="https://www.mcmod.cn/class/17888.html" target="_blank" rel="noopener noreferrer" class="link-card">
                 <div class="card-icon mcmod-icon">
                     <span>MC</span>
                 </div>
@@ -84,7 +84,7 @@
                 </div>
             </a>
 
-            <a href="https://discord.com/invite/jZ9Vhs855E" target="_blank" class="link-card">
+            <a v-tilt href="https://discord.com/invite/jZ9Vhs855E" target="_blank" rel="noopener noreferrer" class="link-card">
                 <div class="card-icon discord-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 126.644 96">
                         <path fill="currentColor"
@@ -104,7 +104,7 @@
                 </div>
             </a>
 
-            <a href="/docs/" class="link-card">
+            <a v-tilt href="/docs/" class="link-card">
                 <div class="card-icon docs-icon">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" focusable="false"
                          viewBox="0 0 12 12">
@@ -146,14 +146,14 @@ export default defineComponent({
 
 <style scoped>
 .link-cards-section {
-    margin-top: 48px;
-    margin-bottom: 64px;
+    margin-top: 34px;
+    margin-bottom: 52px;
 }
 
 .link-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
 }
 
 .link-card {
@@ -161,13 +161,12 @@ export default defineComponent({
     align-items: center;
     background: rgba(16, 32, 22, 0.4);
     border: 1px solid rgba(0, 255, 157, 0.2);
-    padding: clamp(18px, 4vw, 24px);
+    min-height: 104px;
+    padding: 18px;
     text-decoration: none;
     position: relative;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
     backdrop-filter: blur(8px);
-    group: link-card-group;
 }
 
 .link-card::before {
@@ -179,16 +178,18 @@ export default defineComponent({
     height: 100%;
     background: var(--clr-primary);
     opacity: 0.5;
-    transition: all 0.4s ease;
+    transition: width 0.4s ease, opacity 0.4s ease;
 }
 
-.link-card:hover {
+.link-card:hover,
+.link-card:focus-visible {
     background: rgba(16, 32, 22, 0.8);
     border-color: var(--clr-primary);
     box-shadow: 0 10px 30px rgba(0, 255, 157, 0.1);
 }
 
-.link-card:hover::before {
+.link-card:hover::before,
+.link-card:focus-visible::before {
     width: 100%;
     opacity: 0.05;
 }
@@ -197,20 +198,20 @@ export default defineComponent({
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 48px;
-    height: 48px;
+    width: 42px;
+    height: 42px;
     border-radius: 12px;
-    margin-right: 20px;
+    margin-right: 14px;
     flex-shrink: 0;
     font-weight: 800;
     font-size: 1.2rem;
-    transition: all 0.4s ease;
+    transition: transform 0.4s var(--ease-out), color 0.4s ease;
     overflow: hidden;
 }
 
 .card-icon svg {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     color: currentColor;
 }
 
@@ -240,7 +241,7 @@ export default defineComponent({
     color: #ffffff;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 1.4rem;
-    letter-spacing: -1px;
+    letter-spacing: 0;
     transform: scale(0.75);
     transform-origin: center;
 }
@@ -279,15 +280,32 @@ export default defineComponent({
     color: var(--clr-primary);
     opacity: 0;
     transform: translateX(-10px);
-    transition: all 0.4s ease;
+    transition: opacity 0.4s ease, transform 0.4s var(--ease-out);
     width: 24px;
     height: 24px;
     flex-shrink: 0;
 }
 
-.link-card:hover .card-arrow {
+.link-card:hover .card-arrow,
+.link-card:focus-visible .card-arrow {
     opacity: 1;
     transform: translateX(0);
+}
+
+.link-card:hover .card-icon,
+.link-card:focus-visible .card-icon {
+    transform: translateZ(14px) scale(1.04);
+}
+
+.link-card:hover .mcmod-icon,
+.link-card:focus-visible .mcmod-icon {
+    transform: translateZ(14px) scale(0.79);
+}
+
+@media (max-width: 900px) {
+    .link-cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 @media (max-width: 640px) {
@@ -297,6 +315,7 @@ export default defineComponent({
     }
 
     .link-cards-grid {
+        grid-template-columns: 1fr;
         gap: 14px;
     }
 

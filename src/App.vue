@@ -9,8 +9,9 @@ import LinkCards from './components/LinkCards.vue'
 import DownloadCard from './components/DownloadCard.vue'
 import NightlyModal from './components/NightlyModal.vue'
 import LanguageToggle from './components/LanguageToggle.vue'
-import type { VersionInfo } from './components/VersionGroups.vue';
-import { defineComponent } from 'vue'
+import type { VersionInfo } from './components/VersionGroups.vue'
+import { defineComponent, nextTick } from 'vue'
+import { initScrollReveal } from './utils/reveal'
 import {
   applyLocale,
   getInitialLocale,
@@ -39,6 +40,7 @@ export default defineComponent({
     return {
       locale: getInitialLocale() as Locale,
       showNightly: false,
+      revealCleanup: null as null | (() => void),
       // 游戏版本支持列表
       versionList: [
         {
@@ -141,6 +143,14 @@ export default defineComponent({
       }
     }
   },
+  mounted() {
+    nextTick(() => {
+      this.revealCleanup = initScrollReveal()
+    })
+  },
+  beforeUnmount() {
+    this.revealCleanup?.()
+  },
   methods: {
     toggleLocale() {
       this.locale = getNextLocale(this.locale)
@@ -164,7 +174,9 @@ export default defineComponent({
       <main>
         <section id="overview" class="glass-card section-animate">
           <h2 class="section-title">{{ messages.overview.title }}</h2>
-          <p v-for="paragraph in messages.overview.paragraphs" :key="paragraph">{{ paragraph }}</p>
+          <div class="overview-copy">
+            <p v-for="paragraph in messages.overview.paragraphs" :key="paragraph">{{ paragraph }}</p>
+          </div>
         </section>
 
         <AlgorithmsGrid :title="messages.algorithms.title">
@@ -198,7 +210,6 @@ export default defineComponent({
 
 <style>
 :root {
-  /* 浅绿色科技主题色板 */
   --clr-bg: #050a07;
   --clr-primary: #00ff9d;
   --clr-primary-glow: #00ff9d40;
@@ -208,6 +219,7 @@ export default defineComponent({
   --clr-text-muted: #8ab49c;
   --clr-border: rgba(0, 255, 157, 0.15);
   --clr-danger: #ff4a4a;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -221,15 +233,12 @@ html {
 body {
   background-color: var(--clr-bg);
   color: var(--clr-text);
-  font-family: 'Roboto', sans-serif;
   line-height: 1.6;
   overflow-x: hidden;
   overflow-y: visible;
 }
 
 h1, h2, h3, .tech-font { font-family: 'Space Grotesk', sans-serif; }
-
-/* Background & cursor styles moved to BackgroundEffects.vue */
 
 .container {
   width: min(1180px, 100%);
@@ -238,26 +247,16 @@ h1, h2, h3, .tech-font { font-family: 'Space Grotesk', sans-serif; }
   position: relative;
 }
 
-/* Hero Section */
-header {
-  min-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-top: 100px;
-}
-
-
 .hero-title span { color: var(--clr-primary); }
 
 section {
-  margin-bottom: 100px;
+  margin-bottom: clamp(68px, 8vw, 92px);
   position: relative;
 }
 
 .section-title {
   font-size: clamp(1.45rem, 4vw, 2rem);
-  margin-bottom: 40px;
+  margin-bottom: clamp(24px, 4vw, 34px);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -277,34 +276,118 @@ section {
   border-left: 3px solid var(--clr-primary);
   backdrop-filter: blur(16px);
   padding: clamp(22px, 5vw, 32px);
-  transition: transform 0.3s ease, background 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
-/* Algorithm card styles moved to AlgorithmCard.vue */
-
-/* 版本展示标签 */
-.version-group { margin-bottom: 32px; }
-.version-group h3 { font-size: 1.1rem; margin-bottom: 16px; color: #fff; }
-.version-tag {
-  display: inline-block;
-  padding: 8px 20px;
-  margin: 0 12px 12px 0;
-  background: transparent;
-  border: 1px solid var(--clr-border);
+.overview-copy {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(20px, 4vw, 42px);
   color: var(--clr-text-muted);
-  font-family: 'Space Grotesk', sans-serif;
-  transition: all 0.3s;
-}
-.version-tag:hover {
-  border-color: var(--clr-primary);
-  color: var(--clr-primary);
-  background: var(--clr-primary-glow);
 }
 
-/* 问题反馈区域 */
+.overview-copy p {
+  line-height: 1.78;
+}
+
 .issue-card .section-title::before { background: var(--clr-danger); }
 
 footer { padding: 60px 0; text-align: center; color: var(--clr-text-muted); font-size: 0.9rem; border-top: 1px solid var(--clr-border); margin-top: 60px; }
+
+button,
+a,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button, a, select):focus-visible {
+  outline: 2px solid var(--clr-primary);
+  outline-offset: 3px;
+}
+
+.tilt-card {
+  --tilt-x: 0deg;
+  --tilt-y: 0deg;
+  --tilt-lift: 0px;
+  --tilt-glow-x: 50%;
+  --tilt-glow-y: 50%;
+  --reveal-offset: 0px;
+  transform:
+    perspective(900px)
+    translate3d(0, calc(var(--reveal-offset) + var(--tilt-lift)), 0)
+    rotateX(var(--tilt-x))
+    rotateY(var(--tilt-y));
+  transform-style: preserve-3d;
+  will-change: auto;
+  transition:
+    transform 0.55s var(--ease-out),
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    opacity 0.55s ease;
+}
+
+.tilt-card.is-tilting {
+  --tilt-lift: -4px;
+  will-change: transform;
+  transition:
+    transform 0.065s linear,
+    border-color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease,
+    opacity 0.55s ease;
+}
+
+.tilt-card.is-pressed {
+  --tilt-lift: -1px;
+}
+
+.tilt-card > :not(.tilt-highlight) {
+  position: relative;
+  z-index: 1;
+}
+
+.tilt-highlight {
+  position: absolute;
+  inset: -1px;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    circle at var(--tilt-glow-x) var(--tilt-glow-y),
+    rgba(154, 255, 215, 0.13) 0%,
+    rgba(0, 255, 157, 0.04) 26%,
+    transparent 58%
+  );
+  transition: opacity 0.35s ease;
+}
+
+.tilt-card.is-tilting .tilt-highlight {
+  opacity: 1;
+  transition-duration: 0.1s;
+}
+
+.motion-ready .reveal-item {
+  --reveal-offset: 18px;
+  opacity: 0;
+}
+
+.motion-ready .reveal-item.is-visible {
+  --reveal-offset: 0px;
+  opacity: 1;
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.motion-ready .tilt-card.is-tilting {
+  transition-delay: 0ms;
+}
+
+.motion-ready .reveal-item:not(.tilt-card) {
+  transform: translate3d(0, var(--reveal-offset), 0);
+  transition:
+    transform 0.65s var(--ease-out) var(--reveal-delay, 0ms),
+    opacity 0.55s ease var(--reveal-delay, 0ms);
+}
 
 @media (max-width: 768px) {
   .container {
@@ -313,10 +396,6 @@ footer { padding: 60px 0; text-align: center; color: var(--clr-text-muted); font
 
   header {
     min-height: auto;
-  }
-
-  section {
-    margin-bottom: 64px;
   }
 
   .section-title {
@@ -332,9 +411,50 @@ footer { padding: 60px 0; text-align: center; color: var(--clr-text-muted); font
     border-left-width: 2px;
   }
 
+  .overview-copy {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
   footer {
     padding: 36px 0;
     margin-top: 36px;
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .tilt-card {
+    will-change: auto;
+  }
+
+  .tilt-highlight {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .tilt-card {
+    --tilt-x: 0deg !important;
+    --tilt-y: 0deg !important;
+    --tilt-lift: 0px !important;
+    --reveal-offset: 0px !important;
+    transform: none;
+    opacity: 1;
+    will-change: auto;
+  }
+
+  .motion-ready .reveal-item {
+    opacity: 1;
+    transform: none;
   }
 }
 

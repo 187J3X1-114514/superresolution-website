@@ -7,7 +7,6 @@
                 <p class="hero-desc">{{ messages.desc }}</p>
 
                 <div class="btn-group">
-                    <!-- 改成这样：文字包在 <span> 里 -->
                     <a href="https://modrinth.com/mod/superresolution" target="_blank" class="btn btn-primary">
                         <span>{{ messages.modrinth }}</span>
                     </a>
@@ -59,10 +58,10 @@ export default defineComponent({
 
 <style scoped>
 header {
-    min-height: 100vh;
+    min-height: clamp(640px, 92svh, 860px);
     display: flex;
     align-items: center;
-    padding: 84px 0 56px;
+    padding: 72px 0 52px;
 }
 
 .hero-layout {
@@ -70,7 +69,7 @@ header {
     width: 100%;
     align-items: center;
     justify-content: space-between;
-    gap: 40px;
+    gap: clamp(28px, 5vw, 54px);
 }
 
 .hero-left {
@@ -84,10 +83,9 @@ header {
     align-items: center;
     opacity: 0;
     transform: translateX(50px) scale(0.8);
-    animation: heroGraphicEnter 1.5s cubic-bezier(0.16, 1, 0.3, 1) 0.45s forwards;
+    animation: heroGraphicEnter 0.95s var(--ease-out) 0.28s forwards;
 }
 
-/* 文字样式保持一致但微调间距 */
 .hero-badge {
     display: inline-block;
     padding: 6px 16px;
@@ -98,24 +96,24 @@ header {
     font-size: 0.85rem;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
     backdrop-filter: blur(10px);
     opacity: 0;
     transform: translateY(-20px);
-    animation: heroFadeDown 0.8s ease-out 0.2s forwards;
+    animation: heroFadeDown 0.62s ease-out 0.12s forwards;
 }
 
 .hero-title {
-    font-size: clamp(2.9rem, 7vw, 4.5rem);
+    font-size: clamp(2.9rem, 6.4vw, 4.35rem);
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: 20px;
     text-transform: uppercase;
-    letter-spacing: -1px;
+    letter-spacing: 0;
     opacity: 0;
     transform: translateY(50px);
     clip-path: inset(100% 0 0 0);
-    animation: heroTitleReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+    animation: heroTitleReveal 0.9s var(--ease-out) 0.22s forwards;
 }
 
 .hero-title span {
@@ -126,16 +124,15 @@ header {
     font-size: 1.15rem;
     color: var(--clr-text-muted);
     max-width: 550px;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
     opacity: 0;
     transform: translateY(20px);
-    animation: heroFadeUp 0.8s ease-out 0.8s forwards;
+    animation: heroFadeUp 0.65s ease-out 0.52s forwards;
 }
 
-/* Logo 视觉区域 */
 .logo-viewport {
     position: relative;
-    width: min(380px, 34vw);
+    width: min(340px, 31vw);
     aspect-ratio: 1;
     height: auto;
     display: flex;
@@ -158,11 +155,10 @@ header {
 }
 
 .logo-shapes polygon {
-    fill: white; /* 初始颜色 */
+    fill: white;
     transition: fill 0.5s ease;
 }
 
-/* 核心背景发光：让 Logo 像是在发光的核心 */
 .logo-glow {
     position: absolute;
     top: 50%;
@@ -194,7 +190,6 @@ header {
     flex-wrap: wrap;
 }
 
-/* 1. 基础容器 */
 .btn {
     position: relative;
     padding: 14px 32px;
@@ -215,22 +210,21 @@ header {
     z-index: 1;
     opacity: 0;
     transform: translateY(18px);
-    animation: heroFadeUp 0.55s ease-out forwards;
+    animation: heroFadeUp 0.48s ease-out forwards;
 }
 
 .btn-group .btn:first-child {
-    animation-delay: 0.95s;
+    animation-delay: 0.68s;
 }
 
 .btn-group .btn:nth-child(2) {
-    animation-delay: 1.1s;
+    animation-delay: 0.78s;
 }
 
 .btn-group .btn:nth-child(3) {
-    animation-delay: 1.25s;
+    animation-delay: 0.88s;
 }
 
-/* 2. 边框层 */
 .btn::before {
     content: '';
     position: absolute;
@@ -238,10 +232,9 @@ header {
     border: 1px solid var(--clr-primary);
     z-index: 2;
     pointer-events: none;
-    transition: all 0.4s ease;
+    transition: border-color 0.4s ease, background-color 0.4s ease;
 }
 
-/* 3. 填充层（防 1px 抖动最终版） */
 .btn::after {
     content: '';
     position: absolute;
@@ -252,7 +245,7 @@ header {
     transition: transform 0.45s cubic-bezier(0.86, 0, 0.07, 1);
     z-index: -1;
     opacity: 1;
-    will-change: transform; /* 浏览器提前创建独立层 */
+    will-change: transform;
 }
 
 .btn:hover::after {
@@ -267,27 +260,21 @@ header {
     background: rgba(0, 255, 157, 0.05);
 }
 
-/* ==================== 新增：动态文字对比（mix-blend-mode 自动适配） ==================== */
-/* 放在 <style scoped> 最底部 */
-
 .btn {
-    isolation: isolate; /* 创建独立层叠上下文，保证 blend 只影响按钮内部 */
+    isolation: isolate;
 }
 
-/* 把文字包裹进 <span>，让它成为独立混合层 */
 .btn span {
-    color: var(--clr-primary); /* ← 这就是关键“源颜色” */
-    mix-blend-mode: difference; /* 自动根据背后背景计算颜色 */
-    z-index: 3; /* 确保在 ::after 之上、::before 之下 */
+    color: var(--clr-primary);
+    mix-blend-mode: difference;
+    z-index: 3;
     position: relative;
 }
 
-/* 移除所有手动颜色强制（不再需要） */
 .btn:hover {
-    color: inherit !important; /* 取消之前的 #ffffff */
+    color: inherit !important;
 }
 
-/* 可选：如果你希望 hover 时文字也带一点过渡（更丝滑） */
 .btn span {
     transition: filter 0.45s cubic-bezier(0.86, 0, 0.07, 1);
 }
@@ -321,17 +308,16 @@ header {
     }
 }
 
-/* 响应式调整 */
 @media (max-width: 900px) {
     header {
         min-height: auto;
-        padding: 82px 0 58px;
+        padding: 70px 0 48px;
     }
 
     .hero-layout {
         flex-direction: column-reverse;
         text-align: center;
-        gap: 22px;
+        gap: 14px;
     }
 
     .hero-left {
@@ -341,14 +327,14 @@ header {
     }
 
     .logo-viewport {
-        width: min(280px, 72vw);
-        margin-bottom: 4px;
+        width: min(230px, 60vw);
+        margin-bottom: 0;
     }
 }
 
 @media (max-width: 520px) {
     header {
-        padding: 76px 0 44px;
+        padding: 68px 0 38px;
     }
 
     .hero-badge {
@@ -356,18 +342,18 @@ header {
         padding: 6px 12px;
         font-size: 0.72rem;
         letter-spacing: 1px;
-        margin-bottom: 18px;
+        margin-bottom: 14px;
     }
 
     .hero-title {
-        font-size: clamp(2.45rem, 14vw, 3.35rem);
+        font-size: clamp(2.35rem, 13vw, 3.15rem);
         letter-spacing: 0;
         margin-bottom: 16px;
     }
 
     .hero-desc {
         font-size: 1rem;
-        margin-bottom: 28px;
+        margin-bottom: 24px;
     }
 
     .btn-group {
@@ -380,6 +366,23 @@ header {
         padding: 12px 16px;
         font-size: 0.86rem;
         letter-spacing: 0.5px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-badge,
+    .hero-title,
+    .hero-desc,
+    .hero-right,
+    .btn {
+        opacity: 1;
+        transform: none;
+        clip-path: none;
+        animation: none;
+    }
+
+    .logo-glow {
+        animation: none;
     }
 }
 

@@ -1,8 +1,11 @@
 import { createApp } from 'vue'
 import './style.css'
 import App from './App.vue'
+import tilt from './directives/tilt'
 
-createApp(App).mount('#app')
+createApp(App)
+    .directive('tilt', tilt)
+    .mount('#app')
 const fontA = new FontFace('HarmonyOS', 'url(/HarmonyOS_Sans_SC_Medium.woff2)')
 const fontB = new FontFace('JetBrainsMono', 'url(/JetBrainsMono-Medium.ttf)')
 

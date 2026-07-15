@@ -1,34 +1,55 @@
 <template>
-    <section class="version-section">
-        <div class="section-animate">
-            <h2 class="section-title">{{ messages.title }}</h2>
+    <section class="version-section section-animate">
+        <h2 class="section-title">{{ messages.title }}</h2>
 
-            <div class="version-grid">
-                <div v-for="(v, index) in versions" :key="index" class="version-card">
-                    <div class="v-card-header">
-                        <span class="v-loader tech-font">{{ v.loader.toUpperCase() }}</span>
-                        <span :class="['v-state', 'state-' + v.state]">{{ getStateText(v.state) }}</span>
-                    </div>
-                    <div class="v-card-body">
-                        <div class="v-version">{{ v.version }}</div>
-                        <div class="v-latest tech-font">{{ messages.latestLabel }}: {{ v.latest_version }}</div>
+        <div class="version-grid">
+            <article
+                v-for="group in groupedVersions"
+                :key="group.version"
+                v-tilt
+                class="version-card"
+            >
+                <header class="version-header">
+                    <span class="version-number tech-font">{{ group.version }}</span>
+                </header>
+
+                <div class="loader-list">
+                    <div
+                        v-for="entry in group.entries"
+                        :key="`${entry.version}-${entry.loader}`"
+                        class="loader-row"
+                    >
+                        <div class="loader-meta">
+                            <span class="loader-name tech-font">{{ entry.loader.toUpperCase() }}</span>
+                            <span :class="['version-state', `state-${entry.state}`]">
+                                {{ getStateText(entry.state) }}
+                            </span>
+                        </div>
+                        <span class="latest-version tech-font">
+                            {{ messages.latestLabel }}: {{ entry.latest_version }}
+                        </span>
                     </div>
                 </div>
-            </div>
+            </article>
         </div>
     </section>
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue';
-import type {PropType} from 'vue';
+import { defineComponent } from 'vue'
+import type { PropType } from 'vue'
 import type { AppMessages } from '../i18n'
 
 export interface VersionInfo {
-    version: string;
-    loader: string;
-    state: 'lts' | 'main' | 'wip' | 'deprecated';
-    latest_version: string;
+    version: string
+    loader: string
+    state: 'lts' | 'main' | 'wip' | 'deprecated'
+    latest_version: string
+}
+
+interface VersionGroup {
+    version: string
+    entries: VersionInfo[]
 }
 
 export default defineComponent({
@@ -36,136 +57,167 @@ export default defineComponent({
     props: {
         versions: {
             type: Array as PropType<VersionInfo[]>,
-            required: true
+            required: true,
         },
         messages: {
             type: Object as PropType<AppMessages['versions']>,
-            required: true
-        }
+            required: true,
+        },
     },
-    setup(props) {
-        const getStateText = (state: VersionInfo['state']) => {
-            return props.messages.states[state] || state.toUpperCase();
-        };
+    computed: {
+        groupedVersions(): VersionGroup[] {
+            const groups = new Map<string, VersionGroup>()
 
-        return {getStateText};
-    }
-});
+            this.versions.forEach((entry) => {
+                const group = groups.get(entry.version)
+                if (group) {
+                    group.entries.push(entry)
+                    return
+                }
+
+                groups.set(entry.version, {
+                    version: entry.version,
+                    entries: [entry],
+                })
+            })
+
+            return Array.from(groups.values())
+        },
+    },
+    methods: {
+        getStateText(state: VersionInfo['state']) {
+            return this.messages.states[state] || state.toUpperCase()
+        },
+    },
+})
 </script>
 
 <style scoped>
-.version-section {
-    margin-bottom: 32px;
-}
-
 .version-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px;
-    margin-top: 24px;
 }
 
 .version-card {
-    background: rgba(16, 32, 22, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-left: 3px solid var(--clr-primary);
-    padding: 20px;
-    transition: all 0.3s ease;
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    backdrop-filter: blur(8px);
+    min-width: 0;
+    overflow: hidden;
+    background: rgba(10, 25, 15, 0.58);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 3px solid var(--clr-primary);
+    backdrop-filter: blur(10px);
 }
 
 .version-card:hover {
-    background: rgba(16, 32, 22, 0.7);
-    border-color: rgba(0, 255, 157, 0.3);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 15px rgba(0, 255, 157, 0.05);
+    background: rgba(14, 32, 21, 0.78);
+    border-color: rgba(0, 255, 157, 0.38);
+    box-shadow: 0 18px 42px rgba(0, 255, 157, 0.08);
 }
 
-.v-card-header {
+.version-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 12px;
+    padding: 20px 22px 16px;
+    border-bottom: 1px solid rgba(0, 255, 157, 0.12);
 }
 
-.v-loader {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: 1px;
+.version-number {
+    color: var(--clr-text);
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.loader-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.loader-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: center;
+    gap: 6px;
+    padding: 14px 22px;
+}
+
+.loader-row + .loader-row {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.loader-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.loader-name {
     color: #fff;
+    font-size: 0.95rem;
+    font-weight: 700;
 }
 
-.v-state {
-    font-size: 0.75rem;
-    padding: 4px 10px;
-    border-radius: 4px;
+.version-state {
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 0.66rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 0;
+    line-height: 1.35;
     white-space: nowrap;
 }
 
 .state-lts {
-    background: rgba(0, 150, 255, 0.15);
     color: #4da6ff;
+    background: rgba(0, 150, 255, 0.15);
     border: 1px solid rgba(77, 166, 255, 0.3);
 }
 
 .state-main {
-    background: rgba(0, 255, 157, 0.15);
     color: var(--clr-primary);
+    background: rgba(0, 255, 157, 0.15);
     border: 1px solid rgba(0, 255, 157, 0.3);
 }
 
 .state-wip {
-    background: rgba(255, 170, 0, 0.15);
     color: #ffbc40;
+    background: rgba(255, 170, 0, 0.15);
     border: 1px solid rgba(255, 188, 64, 0.3);
 }
 
 .state-deprecated {
+    color: #ff6464;
     background: rgba(255, 64, 64, 0.15);
-    color: #ff4d4d;
     border: 1px solid rgba(255, 77, 77, 0.3);
 }
 
-.v-card-body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.v-version {
-    font-size: clamp(1.35rem, 6vw, 1.8rem);
-    font-weight: 800;
-    color: var(--clr-text);
-    line-height: 1.2;
-}
-
-.v-latest {
-    font-size: 0.85rem;
+.latest-version {
     color: var(--clr-text-muted);
+    font-size: 0.75rem;
     overflow-wrap: anywhere;
+    text-align: left;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 760px) {
     .version-grid {
+        grid-template-columns: 1fr;
         gap: 14px;
     }
-
-    .version-card {
-        padding: 18px;
-        gap: 12px;
-    }
 }
 
-@media (max-width: 360px) {
-    .v-card-header {
-        align-items: flex-start;
-        flex-direction: column;
+@media (max-width: 440px) {
+    .version-header {
+        padding: 18px 16px 14px;
+    }
+
+    .version-state {
+        white-space: normal;
+        text-align: left;
     }
 }
 </style>
-
