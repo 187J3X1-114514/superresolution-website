@@ -461,14 +461,9 @@ Motion vectors must:
 - Be computed as:
 
 ```text
-motion_vector = current_uv - previous_uv
+motion_vector = previous_uv - current_uv
 // motion_vector.x, motion_vector.y ∈ [-1.0, 1.0]
 ```
-
-For example, if a pixel's motion vector value is (-1.0, -0.5), this means:
-
-* The pixel's position in the previous frame was offset to the right by the entire screen width relative to the current frame
-* The pixel's position in the previous frame was offset upward by half the screen height relative to the current frame
 
 Where UV coordinates are based on the **render resolution** (your scaled resolution).
 
