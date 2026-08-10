@@ -22,3 +22,4 @@ Starting from schema version 2, you can use macros in the configuration file. Th
 | --- | --- |
 | Version 1 | 0.8.3-alpha.1 |
 | Version 2 | 0.8.3-alpha.4 |
+| Version 3 | 0.9.0-alpha.1 |

@@ -2,13 +2,15 @@
 title: "Shader Pack Integration Guide"
 ---
 
-# Shader Pack Integration Guide <Badge type="warning" text="0.8.3-alpha.4 ~ 0.8.3-alpha.6" /> <Badge type="tip" text="v2" />
+# Shader Pack Integration Guide <Badge type="warning" text="0.9.0-alpha.1 ~ latest" /> <Badge type="tip" text="v3" />
 
-**Schema Version: 2**
+**Schema Version: 3**
 
 This guide explains how to integrate SR (Super Resolution) into your shader pack.
 SR acts as a **plugin** — it does not take over or modify how the game renders, but simply adds super resolution capability to Iris's (or other shader loaders', though only Iris is currently supported) rendering pipeline.
 You only need to understand what data SR reads and where it writes the result.
+
+Schema version 3 adds **Frame Generation Only mode** and an **algorithm disable list** on top of version 2 — see the [V2 → V3 Changelog](../Diff/V2-V3/).
 
 
 ## How SR Works
@@ -38,13 +40,18 @@ It does not control rendering resolution, and it does not replace any of your pa
 
 ### Step 1: Create the Configuration File
 
-Create a file named `superresolution.json` and place it in the root of your shader pack, next to `shaders.properties`.
+Create a file named `superresolution.v3.json` and place it in the root of your shader pack, next to `shaders.properties`.
+
+::: tip
+The mod tries configuration files in descending schema version order: `superresolution.v3.json`, `superresolution.v2.json`, `superresolution.v1.json`, and finally `superresolution.json`. The first file found is used.
+Using an explicitly versioned file name is recommended, so multiple schema versions can coexist during migration.
+:::
 
 ### Step 2: Write a Minimal Configuration
 
 ```json
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "profiles": {
     "*": {
       "jitter": {
@@ -124,6 +131,8 @@ When a dimension loads, SR looks for a matching profile:
 
 > Dimension keys are determined by the shader pack's own dimension mapping
 > (the same mapping Iris uses via `dimension.world0`, etc.).
+
+Both `supports_frame_generation_only` and `disabled_algorithms` apply per dimension — SR uses the values from the profile matched for the current dimension.
 
 ### Trigger
 
@@ -210,6 +219,10 @@ If `"region"` is omitted, it defaults to `[0, 0, -1, -1]` (full render resolutio
 - Input regions use `-1` (render resolution) because your shader rendered at scaled resolution.
 - Output regions use `-2` (screen resolution) because the upscaled result is at full resolution.
 
+::: warning
+In [Frame Generation Only mode](#frame-generation-only), the render resolution equals the screen resolution, so `-1` and `-2` resolve to the same size.
+:::
+
 
 ### Output
 
@@ -228,6 +241,10 @@ The `"outputs"` section must contain exactly one key: `"upscaled_color"`.
 - `"target"` — A list of buffer names to write the upscaled result to. If multiple targets are specified, the result is written to each one in order. All targets must have the same dimensions.
 - The output is always at **screen resolution**.
 - The output is always **de-jittered** (jitter is removed automatically).
+
+::: warning
+In [Frame Generation Only mode](#frame-generation-only), SR does not perform upscaling and never writes `upscaled_color` — your shader must not rely on that output being updated in this mode.
+:::
 
 
 ### Internal Format
@@ -260,7 +277,7 @@ If omitted or unrecognized, defaults to `RGBA16F`, but it is strongly recommende
 ```
 
 - **Optional field**.
-- **Only accepts type**: `float`.
+- **Only accepts scalar types**: `float`, `int`, `uint`.
 - **Default value**: `1.0`.
 - `source` should be `"const"`, `"variable"`, or `"uniform"`.
 - When `source == "const"`, `value` must be a number;
@@ -303,6 +320,82 @@ If omitted or unrecognized, defaults to `RGBA16F`, but it is strongly recommende
 - When set to `false` (default), SR assumes the motion vectors correspond to un-jittered sample positions.
 
 
+### Frame Generation Only <Badge type="tip" text="New in v3" />
+
+```json
+"supports_frame_generation_only": true
+```
+
+- **Type**: `boolean`
+- **Default**: `false`
+- Declares that your shader pack is compatible with **Frame Generation Only mode**.
+
+Frame Generation Only mode is a working mode introduced in 0.9.0: no upscaling is performed — SR only reads the inputs required for frame generation (color, depth, motion vectors, exposure) and runs frame generation.
+
+**Activation:** the mode is opt-in by the user — when the profile of the current dimension declares `supports_frame_generation_only: true`, the user can select **None** as the upscaling algorithm in the mod settings, which activates Frame Generation Only mode.
+
+**Behavior in this mode:**
+
+- The render scale is forced to `1.0`; your shader should render the scene at **native (screen) resolution**. `-1` (render resolution) in `region` now equals `-2` (screen resolution).
+- SR still reads your `color`, `depth`, `motion_vectors`, and `exposure` inputs at the trigger point (they feed frame generation), so keep providing them as usual.
+- SR does **not** run any upscaling algorithm and does **not** write the `upscaled_color` output.
+- The render ratio option in the mod settings is disabled.
+
+**Macros in this mode:** (see [Part IV](#part-iv-—-shader-macros-and-uniforms))
+
+| Macro                         | Value              |
+| ----------------------------- | ------------------ |
+| `SR_ENABLE`                   | `1`                |
+| `SR_USING_ALGO`               | `SR_ALGO_NONE`     |
+| `SR_SHOULD_APPLY_SCALE`       | `0`                |
+| `SR_SHOULD_APPLY_JITTER`      | `0`                |
+| `SR_ALGO_SUPPORTS_JITTER`     | `0`                |
+| `SR_RENDER_SCALE_FACTOR`      | `1.0`              |
+| `SR_UPSCALE_RATIO`            | `1.0`              |
+| `SR_SCALED_WIDTH` / `HEIGHT`  | Screen resolution  |
+| `SR_JITTER_SEQUENCE_LENGTH`   | `0`                |
+
+Your shader should detect this mode via `SR_SHOULD_APPLY_SCALE` (or `SR_USING_ALGO == SR_ALGO_NONE`), render at native resolution, and skip jitter application.
+
+::: warning
+If your pack does not declare `supports_frame_generation_only`, a user-selected None algorithm falls back to the default algorithm at runtime (the user's configuration is left untouched and is restored once the pack is unloaded).
+:::
+
+
+### Disabled Algorithms <Badge type="tip" text="New in v3" />
+
+```json
+"disabled_algorithms": ["fsr1", "anime4k"]
+```
+
+- **Type**: array of strings
+- **Default**: `[]` (nothing disabled)
+- Declares the algorithms your shader pack is **incompatible** with. Disabled algorithms have no effect in the user's mod settings.
+
+If the user's currently selected algorithm is disabled by your pack, SR falls back to the default algorithm at runtime — **the user's configuration is not modified**, and their original choice is restored once the pack is unloaded.
+
+Available algorithm IDs:
+
+| ID        | Algorithm                                          |
+| --------- | -------------------------------------------------- |
+| `none`    | None (no upscaling, see Frame Generation Only mode) |
+| `fsr1`    | AMD FSR 1                                          |
+| `fsr2`    | AMD FSR 2                                          |
+| `fsr`     | AMD FSR (FSR 3 upscaling)                          |
+| `xess`    | Intel XeSS                                         |
+| `dlss`    | NVIDIA DLSS                                        |
+| `sgsr1`   | Snapdragon SGSR 1                                  |
+| `sgsr2`   | Snapdragon SGSR 2                                  |
+| `anime4k` | Anime4K                                            |
+
+- Blank entries or unknown IDs only log a warning; they do not fail parsing.
+- The list applies per dimension: only the list from the profile matched for the current dimension is used.
+
+::: tip
+Do not use this field unless your pack is genuinely incompatible with an algorithm — it restricts the user's choices.
+:::
+
+
 ### Jitter
 
 When enabled, SR generates subpixel jitter offsets each frame. Your shader can read the jitter values through the provided uniforms (see below) and apply them to the projection matrix.
@@ -335,8 +428,8 @@ variable.vec2.taa_jitter_offset=vec2(0.1,0.2)
 
 The table below explains the fields from the JSON example above:
 
-| Field                                            | Type / Example                              | Description                                                                                                                                                                                                                      |
-| ------------------------------------------------ | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Field                                            | Type / Example                              | Description                                                                                                                                                                                                              |
+| ------------------------------------------------ | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `source`                                         | `"mod"` / `"shaderpack"`                 | Optional, default `"mod"` (SR generates jitter). If `"shaderpack"`, the shaderpack provides jitter; only in this mode does `source_config` take effect. This mode is experimental.                                       |
 | `source_config.jitter_offset.source`             | `const` / `variable` / `uniform`             | Specifies the source type for `jitter_offset`.                                                                                                                                                                               |
 | `source_config.jitter_offset.type`               | `vector2f`                                   | Must be `vector2f`, representing the X and Y components of the jitter value.                                                                                                                                                 |
@@ -347,6 +440,7 @@ The table below explains the fields from the JSON example above:
 
 * Jitter value X, Y ∈ [-0.5, 0.5]
 * If the currently active upscaling algorithm does not support jitter, jitter will not be applied — no error occurs, and the shader runs normally.
+* Jitter is not applied in Frame Generation Only mode (`SR_SHOULD_APPLY_JITTER` is `0`).
 
 
 ### Customs
@@ -423,7 +517,7 @@ Allows custom GLSL preprocessing of motion vectors before they are fed into the 
 
 ```json
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "profiles": {
     "*": {
       "upscale": {
@@ -475,30 +569,30 @@ Important:
 
 ## Part IV — Shader Macros and Uniforms
 
-When SR is installed and a shader pack includes a valid `superresolution.json`, SR injects the following macros and uniforms into your shaders. You can use these to adapt your rendering when SR is active.
+When SR is installed and a shader pack includes a valid `superresolution.v3.json`, SR injects the following macros and uniforms into your shaders. You can use these to adapt your rendering when SR is active.
 
 ### Macros
 
 | Macro                       | Description                                                                                      |
 |-----------------------------|--------------------------------------------------------------------------------------------------|
 | `SR_INSTALLED`              | Always `1` when SR is installed.                                                                 |
-| `SR_CONFIG_SCHEMA_VERSION`  | The version of the current interface configuration file, e.g. `2`, `114514`.                     |
-| `SR_UPSCALE_RATIO_HALF`     | Equal to 0.5 of the upscale ratio.                                                               |
-| `SR_RENDER_SCALE_FACTOR_HALF` | Equal to 0.5 of the render scale factor.                                                       |
-| `SR_ENABLE`                 | `1` if upscaling is enabled, `0` otherwise.                                                     |
+| `SR_CONFIG_SCHEMA_VERSION`  | The schema version of the active interface configuration file — `3` when a V3 config is in use.  |
+| `SR_UPSCALE_RATIO_HALF`     | Equal to 0.5 of the upscale ratio. `0.5` in Frame Generation Only mode.                          |
+| `SR_RENDER_SCALE_FACTOR_HALF` | Equal to 0.5 of the render scale factor. `0.5` in Frame Generation Only mode.                  |
+| `SR_ENABLE`                 | `1` if upscaling is enabled, `0` otherwise. Still `1` in Frame Generation Only mode.            |
 | `SR_DISABLE`                | Inverse of `SR_ENABLE`.                                                                          |
-| `SR_USING_ALGO`             | Integer ID of the currently active algorithm. `0` if upscaling is disabled.                      |
-| `SR_ALGO_<NAME>`            | Integer ID for each registered algorithm (e.g., `SR_ALGO_FSR2`). Useful for comparing with `SR_USING_ALGO`. |
-| `SR_ALGO_SUPPORTS_JITTER`   | `1` if the active algorithm supports jitter, `0` otherwise.                                      |
-| `SR_SHOULD_APPLY_SCALE`     | `1` if upscaling is enabled, `0` otherwise.                                                     |
-| `SR_SHOULD_APPLY_JITTER`    | `1` if upscaling is enabled, `0` otherwise.                                                     |
-| `SR_SCALED_WIDTH`           | Render width (scaled resolution width). Equals screen width when upscaling is disabled.          |
-| `SR_SCALED_HEIGHT`          | Render height (scaled resolution height). Equals screen height when upscaling is disabled.       |
+| `SR_USING_ALGO`             | Integer ID of the currently active algorithm. `0` if upscaling is disabled. `SR_ALGO_NONE` in Frame Generation Only mode. |
+| `SR_ALGO_<NAME>`            | Integer ID for each registered algorithm (e.g., `SR_ALGO_FSR2`, `SR_ALGO_NONE`). Useful for comparing with `SR_USING_ALGO`. |
+| `SR_ALGO_SUPPORTS_JITTER`   | `1` if the active algorithm supports jitter, `0` otherwise. `0` in Frame Generation Only mode.   |
+| `SR_SHOULD_APPLY_SCALE`     | `1` if upscaling is enabled and not in Frame Generation Only mode, `0` otherwise.                |
+| `SR_SHOULD_APPLY_JITTER`    | `1` if upscaling is enabled and not in Frame Generation Only mode, `0` otherwise.                |
+| `SR_SCALED_WIDTH`           | Render width (scaled resolution width). Equals screen width when upscaling is disabled or in Frame Generation Only mode. |
+| `SR_SCALED_HEIGHT`          | Render height (scaled resolution height). Equals screen height when upscaling is disabled or in Frame Generation Only mode. |
 | `SR_SCREEN_WIDTH`           | Screen width (display resolution width).                                                         |
 | `SR_SCREEN_HEIGHT`          | Screen height (display resolution height).                                                       |
-| `SR_JITTER_SEQUENCE_LENGTH` | The length of the current jitter sequence (if jitter is enabled). `0` if jitter is unsupported or disabled. |
-| `SR_RENDER_SCALE_FACTOR`    | The current render scale factor (e.g., `0.5` for 50% scale). `1.0` when upscaling is disabled.    |
-| `SR_UPSCALE_RATIO`          | The current upscale ratio (screen / render). `1.0` when upscaling is disabled.                     |
+| `SR_JITTER_SEQUENCE_LENGTH` | The length of the current jitter sequence (if jitter is enabled). `0` if jitter is unsupported, disabled, or in Frame Generation Only mode. |
+| `SR_RENDER_SCALE_FACTOR`    | The current render scale factor (e.g., `0.5` for 50% scale). `1.0` when upscaling is disabled or in Frame Generation Only mode. |
+| `SR_UPSCALE_RATIO`          | The current upscale ratio (screen / render). `1.0` when upscaling is disabled or in Frame Generation Only mode. |
 | `SR_DLSS_RENDERPRESET`      | Integer ID of the current DLSS render preset (e.g., `SR_ALGO_DLSS_RENDERPRESET_J`). `0` if the active algorithm is not DLSS or upscaling is disabled. |
 | `SR_ALGO_DLSS_RENDERPRESET_<PRESET>` | Integer ID for each registered DLSS render preset (e.g., `SR_ALGO_DLSS_RENDERPRESET_F`). Useful for comparing with `SR_DLSS_RENDERPRESET`. Current presets: `K`, `J`, `F`, `L`, `M`. |
 
@@ -529,31 +623,39 @@ When upscaling is disabled:
 - `SR_USING_ALGO` is `0`.
 - `SR_SCALED_WIDTH` / `SR_SCALED_HEIGHT` equal the screen dimensions.
 
+In Frame Generation Only mode:
+- `SR_SHOULD_APPLY_SCALE` / `SR_SHOULD_APPLY_JITTER` are `0`.
+- `SR_USING_ALGO` is `SR_ALGO_NONE`.
+- Scale-related macros report `1.0`, and `SR_SCALED_WIDTH` / `SR_SCALED_HEIGHT` equal the screen dimensions.
+
 
 ## Part V — Error Handling
 
 SR is designed to never break your shader pipeline.
 
-| Situation                              | Behavior                                    |
-|----------------------------------------|---------------------------------------------|
-| `superresolution.json` does not exist  | SR does nothing. Shader runs normally.       |
-| JSON is malformed                      | SR disables completely.                      |
-| `schema_version` is missing            | SR disables completely.                      |
-| `schema_version` is unsupported        | SR disables completely.                      |
-| No matching profile for current dimension | Super resolution is disabled for that dimension. |
-| A required input is missing or disabled | That frame skips super resolution.           |
-| Algorithm does not support jitter      | Jitter is not applied. No error.            |
+| Situation                                                   | Behavior                                    |
+|-------------------------------------------------------------|---------------------------------------------|
+| `superresolution.v3.json` does not exist                    | Falls back to other config files in version order; if none exists, SR does nothing. |
+| JSON is malformed                                           | SR disables completely.                      |
+| `schema_version` is missing                                 | SR disables completely.                      |
+| `schema_version` is unsupported                             | SR disables completely.                      |
+| No matching profile for current dimension                   | Super resolution is disabled for that dimension. |
+| A required input is missing or disabled                     | That frame skips super resolution.           |
+| Algorithm does not support jitter                           | Jitter is not applied. No error.             |
+| The user's selected algorithm is in `disabled_algorithms`   | Falls back to the default algorithm at runtime; user config untouched. |
+| None is selected but the pack does not declare `supports_frame_generation_only` | Falls back to the default algorithm at runtime; user config untouched. |
+| `disabled_algorithms` contains blank entries or unknown IDs | A warning is logged; the remaining entries still apply. |
 
 SR will log warnings when configuration issues are detected, but it will never crash or corrupt the rendering pipeline.
 
 
 ## Full Example
 
-Here is a complete `superresolution.json` with per-dimension profiles:
+Here is a complete `superresolution.v3.json` with per-dimension profiles:
 
 ```json
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "profiles": {
     "*": {
       "jitter": {
@@ -562,6 +664,8 @@ Here is a complete `superresolution.json` with per-dimension profiles:
       "upscale": {
         "enabled": true,
         "internal_format": "r11g11b10f",
+        "supports_frame_generation_only": true,
+        "disabled_algorithms": ["anime4k"],
         "trigger": {
           "type": "AFTER",
           "pass": "composite2"
@@ -634,6 +738,6 @@ Here is a complete `superresolution.json` with per-dimension profiles:
 ```
 
 In this example:
-- The default profile (`"*"`) triggers after `composite2`.
-- The Nether (`"-1"`) uses a different trigger pass and internal format.
+- The default profile (`"*"`) triggers after `composite2`, declares Frame Generation Only support, and disables Anime4K.
+- The Nether (`"-1"`) uses a different trigger pass and internal format, without Frame Generation Only support or any disabled algorithms.
 - The Overworld and End use the default profile since they have no explicit entry.

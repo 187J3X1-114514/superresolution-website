@@ -21,6 +21,7 @@ export const enSidebar: DefaultTheme.SidebarMulti = {
         {
           text: 'Integration Guides',
           items: [
+            { text: 'Schema Version 3', link: '/Shaderpack-Interface-documentation/Version-3/' },
             { text: 'Schema Version 2', link: '/Shaderpack-Interface-documentation/Version-2/' },
             { text: 'Schema Version 1', link: '/Shaderpack-Interface-documentation/Version-1/' },
           ],
@@ -28,6 +29,7 @@ export const enSidebar: DefaultTheme.SidebarMulti = {
         {
           text: 'Migration',
           items: [
+            { text: 'Schema Version 2 → Version 3 Changelog', link: '/Shaderpack-Interface-documentation/Diff/V2-V3/' },
             { text: 'Schema Version 1 → Version 2 Changelog', link: '/Shaderpack-Interface-documentation/Diff/V1-V2/' },
           ],
         },
@@ -57,6 +59,7 @@ export const zhSidebar: DefaultTheme.SidebarMulti = {
         {
           text: '集成指南',
           items: [
+            { text: 'Schema Version 3', link: '/zh/Shaderpack-Interface-documentation/Version-3/' },
             { text: 'Schema Version 2', link: '/zh/Shaderpack-Interface-documentation/Version-2/' },
             { text: 'Schema Version 1', link: '/zh/Shaderpack-Interface-documentation/Version-1/' },
           ],
@@ -64,6 +67,7 @@ export const zhSidebar: DefaultTheme.SidebarMulti = {
         {
           text: '迁移',
           items: [
+            { text: 'Schema Version 2 → Version 3 变更日志', link: '/zh/Shaderpack-Interface-documentation/Diff/V2-V3/' },
             { text: 'Schema Version 1 → Version 2 变更日志', link: '/zh/Shaderpack-Interface-documentation/Diff/V1-V2/' },
           ],
         },

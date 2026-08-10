@@ -22,3 +22,4 @@ title: "关于"
 | --- | --- |
 | Version 1 | 0.8.3-alpha.1 |
 | Version 2 | 0.8.3-alpha.4 |
+| Version 3 | 0.9.0-alpha.1 |

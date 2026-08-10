@@ -2,11 +2,15 @@
 title: "光影包集成指南"
 ---
 
-# 光影包集成指南 <Badge type="warning" text="0.8.3-alpha.4 ~ 0.8.3-alpha.6" /> <Badge type="tip" text="v2" />
+# 光影包集成指南 <Badge type="warning" text="0.9.0-alpha.1 ~ latest" /> <Badge type="tip" text="v3" />
+
+**Schema 版本：3**
 
 本指南主要介绍如何在你的光影包中集成 SR（Super Resolution，超分辨率）。
 SR 作为一个**插件**——它不会接管或修改游戏的渲染方式，只是为Iris（或是其它光影加载器，尽管现在只支持Iris）的渲染管线添加了超分辨率功能。
 你只需要了解 SR 读取哪些数据、把结果写到哪里。
+
+Schema version 3 在 version 2 的基础上新增了**仅帧生成模式**与**算法禁用列表**，详见 [V2 → V3 变更日志](../Diff/V2-V3/)。
 
 
 ## SR 的工作原理
@@ -37,13 +41,18 @@ SR 是一个插件。它为你现有的管线添加超分辨率能力。
 
 ### 步骤 1：创建配置文件
 
-在光影包根目录下（与 `shaders.properties` 同级）创建名为 `superresolution.json` 的文件。
+在光影包根目录下（与 `shaders.properties` 同级）创建名为 `superresolution.v3.json` 的文件。
+
+::: tip
+模组会按 Schema 版本号从高到低依次尝试 `superresolution.v3.json`、`superresolution.v2.json`、`superresolution.v1.json`，最后回退到 `superresolution.json`，使用最先找到的文件。
+建议显式使用带版本号的文件名，这样可以在迁移期间让不同 Schema 版本的配置共存。
+:::
 
 ### 步骤 2：编写最简配置
 
 ```json
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "profiles": {
     "*": {
         "jitter": {
@@ -123,6 +132,8 @@ SR 是一个插件。它为你现有的管线添加超分辨率能力。
 | `"*"`  | 默认回退 |
 
 > 维度键由光影包自身的维度映射决定（即 Iris 中 `dimension.world0` 等配置使用的映射）。
+
+`supports_frame_generation_only` 与 `disabled_algorithms` 均按维度生效——SR 使用当前维度匹配到的 profile 中的配置。
 
 
 ### 触发点（Trigger）
@@ -214,6 +225,10 @@ SR 需要**三个**必须输入。三个都必须提供且启用。如果任何�
 - 输入区域使用 `-1`（渲染分辨率），因为光影以缩放分辨率渲染。
 - 输出区域使用 `-2`（屏幕分辨率），因为超分结果是全分辨率的。
 
+::: warning
+在[仅帧生成模式](#仅帧生成-frame-generation-only)下，渲染分辨率等于屏幕分辨率，`-1` 与 `-2` 解析结果相同。
+:::
+
 
 ### 输出（Output）
 
@@ -232,6 +247,10 @@ SR 需要**三个**必须输入。三个都必须提供且启用。如果任何�
 - `"target"` — 写入超分结果的缓冲区名称列表。如果指定多个目标，结果会按顺序写入每一个。所有目标必须具有相同的尺寸。
 - 输出始终为**屏幕分辨率**。
 - 输出始终已**去抖动**（抖动会被移除）。
+
+::: warning
+在[仅帧生成模式](#仅帧生成-frame-generation-only)下，SR 不会执行超分，也不会写入 `upscaled_color`——你的光影在此模式下不应依赖该输出被更新。
+:::
 
 
 ### 内部纹理格式（Internal Format）
@@ -264,7 +283,7 @@ SR 需要**三个**必须输入。三个都必须提供且启用。如果任何�
 ```
 
 - **可选字段**。
-- **仅接受类型**：`float`。
+- **仅接受标量类型**：`float`、`int`、`uint`。
 - **默认值**：`1.0`。
 - `source` 应该为 `"const"`、`"variable"` 或 `"uniform"`。
 - 当 `source == "const"` 时，`value` 必须为数字；
@@ -305,6 +324,82 @@ SR 需要**三个**必须输入。三个都必须提供且启用。如果任何�
 - 指示运动矢量是否已包含抖动（jitter）信息。
 - 当设为 `true` 时，表示运动矢量已经考虑了亚像素抖动偏移，SR 将不会额外处理抖动相关的运动矢量修正。
 - 当设为 `false` 时（默认），SR 假设运动矢量对应的是未抖动的采样位置。
+
+
+### 仅帧生成（Frame Generation Only）<Badge type="tip" text="v3 新增" />
+
+```json
+"supports_frame_generation_only": true
+```
+
+- **类型**：`boolean`
+- **默认值**：`false`
+- 声明你的光影包兼容**仅帧生成模式**。
+
+仅帧生成模式是 0.9.0 引入的工作模式：不执行超分辨率，仅向 SR 提供帧生成所需的输入数据（颜色、深度、运动矢量、曝光），由 SR 执行帧生成。
+
+**激活方式：** 该模式由用户选择启用——当当前维度的 profile 声明 `supports_frame_generation_only: true` 时，用户可以在模组设置中将超分算法选择为 **None**（无），此时进入仅帧生成模式。
+
+**该模式下的行为：**
+
+- 渲染缩放被强制为 `1.0`，你的光影应以**原生（屏幕）分辨率**渲染场景；`region` 中的 `-1`（渲染分辨率）此时等于 `-2`（屏幕分辨率）。
+- SR 仍会在触发点读取你提供的 `color`、`depth`、`motion_vectors`、`exposure` 输入（供帧生成使用），因此这些输入仍需照常提供。
+- SR **不会**执行超分算法，也**不会**写入 `upscaled_color` 输出。
+- 模组设置中的渲染比例选项将被禁用。
+
+**该模式下的宏：**（详见[第四部分](#第四部分-—-着色器宏和-uniform)）
+
+| 宏                            | 值                 |
+| ----------------------------- | ------------------ |
+| `SR_ENABLE`                   | `1`                |
+| `SR_USING_ALGO`               | `SR_ALGO_NONE`     |
+| `SR_SHOULD_APPLY_SCALE`       | `0`                |
+| `SR_SHOULD_APPLY_JITTER`      | `0`                |
+| `SR_ALGO_SUPPORTS_JITTER`     | `0`                |
+| `SR_RENDER_SCALE_FACTOR`      | `1.0`              |
+| `SR_UPSCALE_RATIO`            | `1.0`              |
+| `SR_SCALED_WIDTH` / `HEIGHT`  | 等于屏幕分辨率     |
+| `SR_JITTER_SEQUENCE_LENGTH`   | `0`                |
+
+你的光影应通过 `SR_SHOULD_APPLY_SCALE`（或 `SR_USING_ALGO == SR_ALGO_NONE`）检测该模式，并按原生分辨率渲染、跳过抖动应用。
+
+::: warning
+如果你的光影没有声明 `supports_frame_generation_only`，用户选择的 None 算法会在运行时回退到默认算法（不会修改用户的配置，卸载光影后自动恢复其选择）。
+:::
+
+
+### 禁用算法（Disabled Algorithms）<Badge type="tip" text="v3 新增" />
+
+```json
+"disabled_algorithms": ["fsr1", "anime4k"]
+```
+
+- **类型**：字符串数组
+- **默认值**：`[]`（不禁用任何算法）
+- 声明你的光影包**不兼容**的算法列表。被禁用的算法不会在用户的模组设置中生效。
+
+如果用户当前选择的算法被你的光影禁用，SR 会在运行时回退到默认算法——**不会修改用户的配置**，用户卸载光影后会自动恢复其原选择。
+
+可用的算法 ID：
+
+| ID        | 算法                              |
+| --------- | --------------------------------- |
+| `none`    | None（无超分，见仅帧生成模式）    |
+| `fsr1`    | AMD FSR 1                         |
+| `fsr2`    | AMD FSR 2                         |
+| `fsr`     | AMD FSR（FSR 3 超分）             |
+| `xess`    | Intel XeSS                        |
+| `dlss`    | NVIDIA DLSS                       |
+| `sgsr1`   | Snapdragon SGSR 1                 |
+| `sgsr2`   | Snapdragon SGSR 2                 |
+| `anime4k` | Anime4K                           |
+
+- 数组中的空值或未知 ID 只会记录警告，不会导致配置解析失败。
+- 该列表按维度生效：只有当前维度匹配到的 profile 中的列表会被使用。
+
+::: tip
+除非你的光影确实与某个算法不兼容，否则不要使用该字段——它会限制用户的选择。
+:::
 
 
 ### 抖动（Jitter）
@@ -351,6 +446,7 @@ variable.vec2.taa_jitter_offset=vec2(0.1,0.2)
 
 * 抖动值.X,抖动值.Y∈[-0.5,0.5]
 * 如果当前激活的超分算法不支持抖动，那么抖动不会被应用，不会产生错误，光影正常运行。
+* 仅帧生成模式下不应用抖动（`SR_SHOULD_APPLY_JITTER` 为 `0`）。
 
 
 ### 自定义（Customs）
@@ -427,7 +523,7 @@ variable.vec2.taa_jitter_offset=vec2(0.1,0.2)
 
 ```json
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "profiles": {
     "*": {
       "upscale": {
@@ -480,7 +576,7 @@ motion_vector = previous_uv - current_uv
 
 ## 第四部分 — 着色器宏和 Uniform
 
-当 SR 已安装且光影包包含有效的 `superresolution.json` 时，SR 会向你的着色器注入以下宏和 uniform。你可以利用它们在 SR
+当 SR 已安装且光影包包含有效的 `superresolution.v3.json` 时，SR 会向你的着色器注入以下宏和 uniform。你可以利用它们在 SR
 激活时调整渲染行为。
 
 ### 宏（Macros）
@@ -488,23 +584,23 @@ motion_vector = previous_uv - current_uv
 | 宏                                     | 说明                                                                                                                                                               |
 | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `SR_INSTALLED`                         | SR 已安装时始终为 `1`。                                                                                                                                             |
-| `SR_CONFIG_SCHEMA_VERSION`          | 当前接口配置文件的版本，例如 `2`、`114514`。                                                                                                                        |
-| `SR_UPSCALE_RATIO_HALF`                | 等于 0.5 的上采样比例。                                                                                                                                             |
-| `SR_RENDER_SCALE_FACTOR_HALF`          | 等于 0.5 的渲染缩放因子。                                                                                                                                           |
-| `SR_ENABLE`                            | 超分启用时为 `1`，否则为 `0`。                                                                                                                                      |
+| `SR_CONFIG_SCHEMA_VERSION`          | 当前接口配置文件的 Schema 版本，使用 V3 配置时为 `3`。                                                                                                              |
+| `SR_UPSCALE_RATIO_HALF`                | 等于 0.5 的上采样比例。仅帧生成模式下为 `0.5`。                                                                                                                      |
+| `SR_RENDER_SCALE_FACTOR_HALF`          | 等于 0.5 的渲染缩放因子。仅帧生成模式下为 `0.5`。                                                                                                                    |
+| `SR_ENABLE`                            | 超分启用时为 `1`，否则为 `0`。仅帧生成模式下仍为 `1`。                                                                                                              |
 | `SR_DISABLE`                           | `SR_ENABLE` 的反义。                                                                                                                                                |
-| `SR_USING_ALGO`                        | 当前激活算法的整数 ID。超分禁用时为 `0`。                                                                                                                           |
-| `SR_ALGO_<NAME>`                       | 每个已注册算法的整数 ID（如 `SR_ALGO_FSR2`）。可与 `SR_USING_ALGO` 比较使用。                                                                                     |
-| `SR_ALGO_SUPPORTS_JITTER`              | 当前算法支持抖动时为 `1`，否则为 `0`。                                                                                                                              |
-| `SR_SHOULD_APPLY_SCALE`                | 超分启用时为 `1`，否则为 `0`。                                                                                                                                      |
-| `SR_SHOULD_APPLY_JITTER`               | 超分启用时为 `1`，否则为 `0`。                                                                                                                                      |
-| `SR_SCALED_WIDTH`                      | 渲染宽度（缩放分辨率宽度）。超分禁用时等于屏幕宽度。                                                                                                                |
-| `SR_SCALED_HEIGHT`                     | 渲染高度（缩放分辨率高度）。超分禁用时等于屏幕高度。                                                                                                                |
+| `SR_USING_ALGO`                        | 当前激活算法的整数 ID。超分禁用时为 `0`。仅帧生成模式下为 `SR_ALGO_NONE`。                                                                                          |
+| `SR_ALGO_<NAME>`                       | 每个已注册算法的整数 ID（如 `SR_ALGO_FSR2`、`SR_ALGO_NONE`）。可与 `SR_USING_ALGO` 比较使用。                                                                       |
+| `SR_ALGO_SUPPORTS_JITTER`              | 当前算法支持抖动时为 `1`，否则为 `0`。仅帧生成模式下为 `0`。                                                                                                        |
+| `SR_SHOULD_APPLY_SCALE`                | 超分启用且非仅帧生成模式时为 `1`，否则为 `0`。                                                                                                                      |
+| `SR_SHOULD_APPLY_JITTER`               | 超分启用且非仅帧生成模式时为 `1`，否则为 `0`。                                                                                                                      |
+| `SR_SCALED_WIDTH`                      | 渲染宽度（缩放分辨率宽度）。超分禁用或仅帧生成模式下等于屏幕宽度。                                                                                                  |
+| `SR_SCALED_HEIGHT`                     | 渲染高度（缩放分辨率高度）。超分禁用或仅帧生成模式下等于屏幕高度。                                                                                                  |
 | `SR_SCREEN_WIDTH`                      | 屏幕宽度（显示分辨率宽度）。                                                                                                                                         |
 | `SR_SCREEN_HEIGHT`                     | 屏幕高度（显示分辨率高度）。                                                                                                                                         |
-| `SR_JITTER_SEQUENCE_LENGTH`            | 当前抖动序列的长度（如果启用抖动）。如果不支持抖动或未启用，则为 `0`。                                                                                              |
-| `SR_RENDER_SCALE_FACTOR`               | 当前渲染缩放因子（如 50% 缩放时为 `0.5`）。超分禁用时为 `1.0`。                                                                                                     |
-| `SR_UPSCALE_RATIO`                     | 当前放大比率（屏幕 / 渲染）。超分禁用时为 `1.0`。                                                                                                                   |
+| `SR_JITTER_SEQUENCE_LENGTH`            | 当前抖动序列的长度（如果启用抖动）。不支持、未启用抖动或仅帧生成模式下为 `0`。                                                                                      |
+| `SR_RENDER_SCALE_FACTOR`               | 当前渲染缩放因子（如 50% 缩放时为 `0.5`）。超分禁用或仅帧生成模式下为 `1.0`。                                                                                       |
+| `SR_UPSCALE_RATIO`                     | 当前放大比率（屏幕 / 渲染）。超分禁用或仅帧生成模式下为 `1.0`。                                                                                                     |
 | `SR_DLSS_RENDERPRESET`                 | 当前 DLSS 渲染预设的整数 ID（如 `SR_ALGO_DLSS_RENDERPRESET_J`）。如果当前算法不是 DLSS 或未启用，则为 `0`。                                                       |
 | `SR_ALGO_DLSS_RENDERPRESET_<PRESET>`   | 每个已注册 DLSS 渲染预设的整数 ID（如 `SR_ALGO_DLSS_RENDERPRESET_F`）。可与 `SR_ALGO_DLSS_RENDERPRESET` 比较使用。目前有 `K`, `J`, `F` , `L` , `M`。            |
 
@@ -537,29 +633,38 @@ motion_vector = previous_uv - current_uv
 - `SR_USING_ALGO` 为 `0`。
 - `SR_SCALED_WIDTH` / `SR_SCALED_HEIGHT` 等于屏幕尺寸。
 
+仅帧生成模式下：
+
+- `SR_SHOULD_APPLY_SCALE` / `SR_SHOULD_APPLY_JITTER` 为 `0`。
+- `SR_USING_ALGO` 为 `SR_ALGO_NONE`。
+- 缩放相关宏为 `1.0`，`SR_SCALED_WIDTH` / `SR_SCALED_HEIGHT` 等于屏幕尺寸。
+
 
 ## 第五部分 — 错误处理
 
-| 情况                            | 行为                          |
-| ------------------------------- | ----------------------------- |
-| `superresolution.json` 不存在   | SR 什么都不做。光影正常运行。 |
-| JSON 格式错误                   | SR 完全禁用。                 |
-| 缺少 `schema_version`           | SR 完全禁用。                 |
-| `schema_version` 不受支持       | SR 完全禁用。                 |
-| 当前维度没有匹配的配置          | 该维度的超分功能被禁用。      |
-| 某个必需输入缺失或禁用          | 该帧跳过超分。                |
-| 算法不支持抖动                  | 抖动不生效，不报错。          |
+| 情况                                          | 行为                                                      |
+| --------------------------------------------- | --------------------------------------------------------- |
+| `superresolution.v3.json` 不存在              | 按版本顺序回退查找其他配置文件；全部不存在时 SR 什么都不做。 |
+| JSON 格式错误                                 | SR 完全禁用。                                             |
+| 缺少 `schema_version`                         | SR 完全禁用。                                             |
+| `schema_version` 不受支持                     | SR 完全禁用。                                             |
+| 当前维度没有匹配的配置                        | 该维度的超分功能被禁用。                                  |
+| 某个必需输入缺失或禁用                        | 该帧跳过超分。                                            |
+| 算法不支持抖动                                | 抖动不生效，不报错。                                      |
+| 用户选择的算法在 `disabled_algorithms` 中     | 运行时回退到默认算法，不修改用户配置。                    |
+| 用户选择 None 但光影未声明 `supports_frame_generation_only` | 运行时回退到默认算法，不修改用户配置。          |
+| `disabled_algorithms` 包含空值或未知 ID       | 记录警告，其余条目正常生效。                              |
 
 SR 在检测到配置问题时会输出警告日志，但不会崩溃或破坏渲染管线。
 
 
 ## 完整示例
 
-以下是一个包含多维度配置的完整 `superresolution.json`：
+以下是一个包含多维度配置的完整 `superresolution.v3.json`：
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 3,
   "profiles": {
     "*": {
         "jitter": {
@@ -568,6 +673,8 @@ SR 在检测到配置问题时会输出警告日志，但不会崩溃或破坏�
         "upscale": {
             "enabled": true,
             "internal_format": "r11g11b10f",
+            "supports_frame_generation_only": true,
+            "disabled_algorithms": ["anime4k"],
             "trigger": {
                 "type": "AFTER",
                 "pass": "composite2"
@@ -641,6 +748,6 @@ SR 在检测到配置问题时会输出警告日志，但不会崩溃或破坏�
 
 在这个示例中：
 
-- 默认配置（`"*"`）在 `composite2` 之后触发。
-- 下界（`"-1"`）使用不同的触发 pass 和内部纹理格式。
+- 默认配置（`"*"`）在 `composite2` 之后触发，声明支持仅帧生成模式，并禁用 Anime4K。
+- 下界（`"-1"`）使用不同的触发 pass 和内部纹理格式，未声明仅帧生成支持，也未禁用任何算法。
 - 主世界和末地没有单独的配置项，因此使用默认配置。
