@@ -1,6 +1,6 @@
-import type { DefaultTheme } from 'vitepress'
+import type { MermaidTheme } from '@unify-js/vitepress-mermaid';
 
-export const enSidebar: DefaultTheme.SidebarMulti = {
+export const enSidebar: MermaidTheme.SidebarMulti = {
   '/': [
     {
       text: 'Overview',
@@ -38,7 +38,7 @@ export const enSidebar: DefaultTheme.SidebarMulti = {
   ],
 }
 
-export const zhSidebar: DefaultTheme.SidebarMulti = {
+export const zhSidebar: MermaidTheme.SidebarMulti = {
   '/zh/': [
     {
       text: '概览',
@@ -102,7 +102,7 @@ function makeActiveMatch(links: string[]) {
   return prefix ? `^${escapeRegExp(prefix)}` : undefined
 }
 
-function flattenSidebarLinks(items: DefaultTheme.SidebarItem[] = []): DefaultTheme.NavItemWithLink[] {
+function flattenSidebarLinks(items: MermaidTheme.SidebarItem[] = []): MermaidTheme.NavItemWithLink[] {
   return items.flatMap((item) => {
     const links = flattenSidebarLinks(item.items)
 
@@ -118,7 +118,7 @@ function flattenSidebarLinks(items: DefaultTheme.SidebarItem[] = []): DefaultThe
   })
 }
 
-function sidebarToNav(sidebar: DefaultTheme.SidebarMulti, base: string): DefaultTheme.NavItem[] {
+function sidebarToNav(sidebar: MermaidTheme.SidebarMulti, base: string): MermaidTheme.NavItem[] {
   const sidebarConfig = sidebar[base]
   if (!sidebarConfig) return []
 
@@ -150,5 +150,5 @@ function sidebarToNav(sidebar: DefaultTheme.SidebarMulti, base: string): Default
   ].filter(Boolean)
 }
 
-export const enNav: DefaultTheme.NavItem[] = sidebarToNav(enSidebar, '/')
-export const zhNav: DefaultTheme.NavItem[] = sidebarToNav(zhSidebar, '/zh/')
+export const enNav: MermaidTheme.NavItem[] = sidebarToNav(enSidebar, '/')
+export const zhNav: MermaidTheme.NavItem[] = sidebarToNav(zhSidebar, '/zh/')

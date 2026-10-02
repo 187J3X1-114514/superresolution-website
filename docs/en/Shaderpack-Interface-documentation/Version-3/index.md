@@ -154,7 +154,7 @@ Choose the trigger point based on your pipeline:
 
 ### Inputs
 
-SR requires **three** inputs. All three must be provided and enabled. If any input is missing or disabled, super resolution will not run for that frame.
+Every temporal upscaler requires the three core inputs `color`, `depth`, and `motion_vectors`. The active algorithm may declare additional required inputs. If any input required by that algorithm is missing or disabled, super resolution does not run for that frame.
 
 ```json
 "inputs": {
@@ -176,12 +176,28 @@ SR requires **three** inputs. All three must be provided and enabled. If any inp
 }
 ```
 
-| Input              | Description                                        |
-|--------------------|----------------------------------------------------|
-| `color`            | The rendered scene color at your scaled resolution. |
-| `depth`            | The depth buffer.                                   |
-| `exposure`         | Exposure value, a 1×1 texture.                      |
-| `motion_vectors`   | Per-pixel motion vectors in UV space (RG channels). |
+| Input | Applies to | Description |
+| --- | --- | --- |
+| `color` | Core required | Rendered scene color at the scaled resolution. |
+| `depth` | Core required | Depth buffer. |
+| `motion_vectors` | Core required | Per-pixel motion vectors in UV space (RG channels). |
+| `exposure` | Optional | Exposure value in a 1x1 texture. |
+| `diffuse_albedo` | DLSS-RR required | Linear diffuse reflectance. |
+| `specular_albedo` | DLSS-RR required | Linear specular reflectance. |
+| `normal_roughness` | DLSS-RR alternative path | RGB normals with linear roughness in alpha. Takes precedence over separate normal/roughness inputs. |
+| `normals` | DLSS-RR alternative path | Normalized shading normals paired with `roughness`. |
+| `roughness` | DLSS-RR alternative path | Linear roughness paired with `normals`. |
+| `specular_motion_vectors` | DLSS-RR reflection path | Dense motion vectors for reflected geometry. |
+| `specular_hit_distance` | DLSS-RR reflection path | World-space distance from the primary surface to a specular-ray hit. |
+| `transparency_layer` | DLSS-RR optional | Transparency color separated from noisy color. |
+| `transparency_layer_opacity` | DLSS-RR optional | Opacity paired with the transparency color layer. |
+| `color_before_transparency` | DLSS-RR optional | Noisy color before transparent content is composited. |
+| `screen_space_subsurface_scattering_guide` | DLSS-RR optional | Single-channel screen-space subsurface-scattering guide. |
+| `depth_of_field_guide` | DLSS-RR optional | Single-channel depth-of-field guide. |
+
+::: tip Additional DLSS-RR contract
+DLSS-RR also requires one normal/roughness path and either reflection motion vectors or specular hit distance. See the [NVIDIA DLSS-RR Integration Guide](https://github.com/NVIDIA/DLSS/blob/main/doc/DLSS-RR%20Integration%20Guide.pdf) for formats, coordinates, pipeline ordering, and complete examples.
+:::
 
 **`src`** can be any of the following texture names:
 
@@ -384,6 +400,7 @@ Available algorithm IDs:
 | `fsr`     | AMD FSR (FSR 3 upscaling)                          |
 | `xess`    | Intel XeSS                                         |
 | `dlss`    | NVIDIA DLSS                                        |
+| `dlssrr`  | NVIDIA DLSS Ray Reconstruction                     |
 | `sgsr1`   | Snapdragon SGSR 1                                  |
 | `sgsr2`   | Snapdragon SGSR 2                                  |
 | `anime4k` | Anime4K                                            |
@@ -464,7 +481,7 @@ Allows custom GLSL preprocessing of motion vectors before they are fed into the 
 
 **Behavioral differences:**
 
-- **FSR / DLSS / XeSS**: The motion vector passed to the function has already had its Y axis flipped (equivalent to `mv * vec2(1.0, -1.0)`). The function code is injected into `process_input_textures.comp` and called during motion vector processing:
+- **FSR / DLSS / DLSS-RR / XeSS**: The motion vector passed to the function has already had its Y axis flipped (equivalent to `mv * vec2(1.0, -1.0)`). The function code is injected into `process_input_textures.comp` and called during motion vector processing:
 
   ```glsl
   #ifdef HAS_MOTION_VECTOR
@@ -593,8 +610,8 @@ When SR is installed and a shader pack includes a valid `superresolution.v3.json
 | `SR_JITTER_SEQUENCE_LENGTH` | The length of the current jitter sequence (if jitter is enabled). `0` if jitter is unsupported, disabled, or in Frame Generation Only mode. |
 | `SR_RENDER_SCALE_FACTOR`    | The current render scale factor (e.g., `0.5` for 50% scale). `1.0` when upscaling is disabled or in Frame Generation Only mode. |
 | `SR_UPSCALE_RATIO`          | The current upscale ratio (screen / render). `1.0` when upscaling is disabled or in Frame Generation Only mode. |
-| `SR_DLSS_RENDERPRESET`      | Integer ID of the current DLSS render preset (e.g., `SR_ALGO_DLSS_RENDERPRESET_J`). `0` if the active algorithm is not DLSS or upscaling is disabled. |
-| `SR_ALGO_DLSS_RENDERPRESET_<PRESET>` | Integer ID for each registered DLSS render preset (e.g., `SR_ALGO_DLSS_RENDERPRESET_F`). Useful for comparing with `SR_DLSS_RENDERPRESET`. Current presets: `K`, `J`, `F`, `L`, `M`. |
+| `SR_ALGO_DLSS_RENDERPRESET` | Integer ID of the current DLSS render preset (e.g., `SR_ALGO_DLSS_RENDERPRESET_J`). `0` if the active algorithm is not DLSS or upscaling is disabled. |
+| `SR_ALGO_DLSS_RENDERPRESET_<PRESET>` | Integer ID for each registered DLSS render preset (e.g., `SR_ALGO_DLSS_RENDERPRESET_F`). Useful for comparing with `SR_ALGO_DLSS_RENDERPRESET`. Current presets: `K`, `J`, `F`, `L`, `M`. |
 
 ### Uniforms
 
@@ -640,7 +657,7 @@ SR is designed to never break your shader pipeline.
 | `schema_version` is missing                                 | SR disables completely.                      |
 | `schema_version` is unsupported                             | SR disables completely.                      |
 | No matching profile for current dimension                   | Super resolution is disabled for that dimension. |
-| A required input is missing or disabled                     | That frame skips super resolution.           |
+| An input required by the active algorithm is missing or disabled | That frame skips super resolution.        |
 | Algorithm does not support jitter                           | Jitter is not applied. No error.             |
 | The user's selected algorithm is in `disabled_algorithms`   | Falls back to the default algorithm at runtime; user config untouched. |
 | None is selected but the pack does not declare `supports_frame_generation_only` | Falls back to the default algorithm at runtime; user config untouched. |

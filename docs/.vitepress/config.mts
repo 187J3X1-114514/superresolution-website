@@ -1,7 +1,9 @@
 import { defineConfig } from 'vitepress'
 import { enNav, enSidebar, zhNav, zhSidebar } from './navigation.mts'
+import vitepressMermaidConfig from '@unify-js/vitepress-mermaid/config';
 
 export default defineConfig({
+  extends: vitepressMermaidConfig,
   base: '/docs/',
   outDir: '../dist/docs',
   lang: 'en-US',

@@ -1,5 +1,8 @@
 import { inBrowser, type Theme } from 'vitepress'
-import { Fragment, h } from 'vue'
+import { Fragment, h, resolveComponent } from 'vue'
+import { MermaidTheme } from '@unify-js/vitepress-mermaid';
+import '@unify-js/vitepress-mermaid/style.css';
+
 import DefaultTheme from 'vitepress/theme'
 import ContentHoverRail from './ContentHoverRail.vue'
 import HomeShaderBackground from './HomeShaderBackground.vue'
@@ -36,8 +39,10 @@ async function installMaterialWeb() {
 
 export default {
   extends: DefaultTheme,
-  Layout: () =>
-    h(DefaultTheme.Layout, null, {
+  Layout: () => {
+    const MermaidPreview = resolveComponent('MermaidPreview')
+
+    return h(DefaultTheme.Layout, null, {
       'home-hero-actions-before-actions': () =>
         h(Md3HomeFeatures, { mode: 'actions' }),
       'home-features-after': () => h(Md3HomeFeatures, { mode: 'features' }),
@@ -47,10 +52,12 @@ export default {
           h(ContentHoverRail),
           h(Md3DocControls),
           h(Md3NavigationRipples),
+          h(MermaidPreview),
         ]),
-    }),
+    })
+  },
   enhanceApp(context) {
-    DefaultTheme.enhanceApp?.(context)
+    MermaidTheme.enhanceApp?.(context)
 
     if (!inBrowser) return
 
